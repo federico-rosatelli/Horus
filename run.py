@@ -50,5 +50,5 @@ e.newEval("public/images/boat.png")
 pp = e.getNextObj()
 
 
-e.showGaussianDiff()
+#e.showGaussianDiff()
 e.showImage()

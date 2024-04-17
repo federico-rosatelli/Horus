@@ -18,7 +18,7 @@ class Eval:
         self.printer = None
         pass
 
-    def newEval(self,png_file) ->None|str:
+    def newEval(self,png_file) ->None:
         data = borderEval.borderSegments(png_file)
         if len(data) == 0:
             return f"Cannot find an object in image {png_file}"
@@ -31,7 +31,7 @@ class Eval:
             self.next_obj.append(data[d])
         return
 
-    def getEvaluationPoint(self,eval_points:dict) ->list[float]:
+    def getEvaluationPoint(self,eval_points:dict) ->list:
         evals = [
             # Grandezza
             self.b1*(
@@ -40,8 +40,8 @@ class Eval:
             # Frastagliato
             self.b2*(
                 1 - (
-                    np.count_nonzero(eval_points["bwImage"])/
-                    np.count_nonzero(eval_points["gaussianDiff"])
+                        (np.count_nonzero(eval_points["bwImage"])-np.count_nonzero(eval_points["gaussianDiff"]))/
+                        eval_points["totArea"]
                 )
             ),
             # Colore acceso
@@ -86,19 +86,19 @@ class Eval:
         self.printer = printer.Printer(m_vect)
         return m_vect
     
-    def showImage(self):
+    def showImage(self) -> None:
         if not self.printer:
             return
         self.printer.showImgContours()
         return
     
-    def showBwImage(self):
+    def showBwImage(self) -> None:
         if not self.printer:
             return
         self.printer.showBwImage()
         return
     
-    def showGaussianDiff(self):
+    def showGaussianDiff(self) -> None:
         if not self.printer:
             return
         self.printer.showGaussianDiff()

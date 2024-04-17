@@ -16,8 +16,7 @@ class Printer:
     
     def showImgContours(self) -> None:
         img = self.img.copy()
-        for con in self.contours:
-            cv2.drawContours(img, [con], -1, (0,0,255), 3)
+        cv2.drawContours(img, self.contours, -1, (0,0,255), 3)
         cv2.imshow("Object Contours",img)
         cv2.waitKey(0)
         return
