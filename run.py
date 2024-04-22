@@ -1,8 +1,10 @@
 from glob import glob
 import random
+import cv2
 from matplotlib import pyplot as plt
 from dataLoader.dataLoader import AVS1KDataloader
 from evaluation import evaluator
+from objectDetection import visDrone
 
 
 
@@ -12,12 +14,12 @@ class Displayer:
         self.loader = loader
         self.type = type
         length = len(glob(f"{loader}/{type}/Frame/*"))
-        self.item = item if item >= 0 else random.randint(0,length)
-        self.item = self.item if self.item < length else length - 1
+        self.item = random.randint(0,length) if item < 0 else item if item < length else length - 1
+        #self.item = self.item if self.item < length else length - 1
         self.dataloader = AVS1KDataloader(loader,type)
         self.image,self.label = self.dataloader.__getitem__(self.item)
-        self.nframe = nframe if nframe >= 0 else random.randint(0,len(self.image))
-        self.nframe = self.nframe if self.nframe < len(self.image) else len(self.image)-1
+        self.nframe = random.randint(0,len(self.image)) if nframe < 0 else nframe if nframe < len(self.image) else len(self.image)-1
+        #self.nframe = self.nframe if self.nframe < len(self.image) else len(self.image)-1
 
 
     def show(self)->None:
@@ -38,17 +40,21 @@ class Displayer:
         print()
 
 
-
-# d = Displayer()
+# d = Displayer(item=146,nframe=27)
 # d.show()
-# rembg
+# # d = Displayer()
+# # d.show()
+# # rembg
 
-e = evaluator.Eval(0.5,0.7,0.1,0.1)
-e.newEval("public/images/boat.png")
+e = evaluator.Eval()
+e.newEval("public/images/ski_new.png")
 
 
 pp = e.getNextObj()
-
-
-#e.showGaussianDiff()
 e.showImage()
+pp = e.getNextObj()
+e.showImage()
+
+vp = visDrone.VisDroneModel(device="cpu")
+predict,boxes = vp.predictImage("public/images/ski.png")
+vp.showImage(predict)
