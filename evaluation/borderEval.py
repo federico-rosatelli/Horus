@@ -7,7 +7,6 @@ import skimage.exposure
 import scipy.ndimage as ndi
 
 
-
 def borderSegments(png_file:str) -> dict:
     img = cv2.imread(png_file)
 
@@ -17,16 +16,16 @@ def borderSegments(png_file:str) -> dict:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     contours, _ = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    minArea = ((h*w)/100)*2
+    minArea = ((h*w)/100)*0.8
 
     contObj = {}
     for con in contours:
-        area = cv2.contourArea(con)
-        if area > minArea:
-            blank_image = np.zeros((h,w,3), np.uint8)
+        blank_image = np.zeros((h,w,3), np.uint8)
+        cv2.drawContours(blank_image, [con], -1, (255, 255, 255), thickness=cv2.FILLED)
+        area = np.count_nonzero(blank_image)
 
-            cv2.drawContours(blank_image, [con], -1, (255, 255, 255), thickness=cv2.FILLED)
-            
+        if area > minArea:
+            masked = cv2.bitwise_and(blank_image,img)
             contObj[str(uuid4())] = {
                 "contours" : con,
                 "img":img,
@@ -35,7 +34,7 @@ def borderSegments(png_file:str) -> dict:
                 "bwImage": blank_image,
                 "gaussianDiff":gaussianBorder(blank_image),
                 "symmetry":objectSymmetry(blank_image,con),
-                "dominantColor":dominantColor(img)
+                "dominantColor":dominantColor(masked)
             }
 
     return contObj
@@ -60,10 +59,21 @@ def objectSymmetry(img,con): #TODO
     farthest = max(new_con,key=distance_metric)
     closest = min(new_con,key=distance_metric)
     
+
+    #### Object symmetry TODO ###
     shape = img.shape
     mask = np.zeros([shape[0],shape[1]],dtype=np.uint8)
 
-    
+    rect_vertices = [
+        (0,0),
+        (0,shape[1]),
+        (shape[0],shape[1]),
+        (shape[0],0)
+    ]
+    for i in range(len(rect_vertices)):
+        x3, y3 = rect_vertices[i]
+        x4, y4 = rect_vertices[(i + 1) % len(rect_vertices)]
+
     # image = cv2.circle(img, (int(cx),int(cy)), radius=3, color=(0, 0, 255), thickness=-1)
     # cv2.circle(image, (farthest[0],farthest[1]), radius=3, color=(0, 0, 255), thickness=-1)
     # cv2.circle(image, (closest[0],closest[1]), radius=3, color=(0, 0, 255), thickness=-1)
@@ -71,6 +81,9 @@ def objectSymmetry(img,con): #TODO
     # cv2.line(image, (int(cx),int(cy)), (closest[0],closest[1]), color=(0, 0, 255), thickness=1)
     # cv2.imshow("asd",image)
     # cv2.waitKey(0)
+    
+    ### END TODO ###
+    
     return {
         "center": (cx,cy),
         "farthestP": farthest,
@@ -78,7 +91,10 @@ def objectSymmetry(img,con): #TODO
     }
 
 def dominantColor(img):
-    pixels = np.float32(img.reshape(-1, 3))
+    # mask for black pixels
+    imgs = np.float32(img.reshape(-1, 3))
+    mask = np.any(imgs != 0, axis=1)
+    pixels = imgs[mask] 
 
     n_colors = 5
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 200, .1)
@@ -88,6 +104,4 @@ def dominantColor(img):
     _, counts = np.unique(labels, return_counts=True)
     dominant = palette[np.argmax(counts)]
 
-    return (int(dominant[0]*255),int(dominant[1]*255),int(dominant[2]*255))
-
-#borderSegments("../human.png")
+    return (int(dominant[0]),int(dominant[1]),int(dominant[2]))

@@ -40,8 +40,7 @@ class Eval:
             # Frastagliato
             self.b2*(
                 1 - (
-                        (np.count_nonzero(eval_points["bwImage"])-np.count_nonzero(eval_points["gaussianDiff"]))/
-                        eval_points["totArea"]
+                        (np.count_nonzero(eval_points["bwImage"])/np.count_nonzero(eval_points["gaussianDiff"]))
                 )
             ),
             # Colore acceso
@@ -72,7 +71,6 @@ class Eval:
                 )
             )
         ]
-        print(evals)
         return evals
     
     def getNextObj(self) -> dict:
