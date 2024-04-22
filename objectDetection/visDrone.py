@@ -1,19 +1,36 @@
-#pip install ultralyticsplus==0.0.28 ultralytics==8.0.43
+#pip install ultralyticsplus ultralytics
+from evaluation.printer import Printer
 from ultralyticsplus import YOLO, render_result
+import cv2
+import numpy as np
+import warnings
+warnings.simplefilter("ignore", UserWarning)
 
-# load model
-model = YOLO('mshamrai/yolov8n-visdrone')
 
-# set model parameters
-model.overrides['conf'] = 0.25  # NMS confidence threshold
-model.overrides['iou'] = 0.45  # NMS IoU threshold
-model.overrides['agnostic_nms'] = False  # NMS class-agnostic
-model.overrides['max_det'] = 1000
 
-image = "path_to_image"
+class VisDroneModel:
+    def __init__(self,model:str="mshamrai/yolov8n-visdrone", conf:float=0.25, iou:float=0.45, agnostic_nms:bool=False, max_det:int=1000,device:str="cuda") -> None:
+        self.model = YOLO(model)
+        self.model.overrides['conf'] = conf
+        self.model.overrides['iou'] = iou
+        self.model.overrides['agnostic_nms'] = agnostic_nms
+        self.model.overrides['max_det'] = max_det
 
-results = model.predict(image)
+        self.model = self.model.cpu() if device == "cpu" else self.model.cuda()
 
-print(results[0].boxes)
-render = render_result(model=model, image=image, result=results[0])
-render.show()
+        self.predicted = []
+        
+    
+    def predictImage(self,image:any) -> tuple[np.ndarray,list[list[int]]]:
+        results = self.model.predict(image, show_labels=False, show_conf=False)
+        boxes = []
+        for box in results[0].boxes.numpy():
+            r = box.xyxy[0].astype(int)
+            boxes.append(r)
+        img = results[0].plot(labels=False,conf=False)
+        self.predicted.append((img,boxes))
+        return img,boxes
+    
+    def showImage(self,image:np.ndarray) -> None:
+        Printer({}).showImage(image)
+        return
