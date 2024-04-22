@@ -1,3 +1,8 @@
 2020-TIP-Fu-MMNet/*
 dataLoader/__pycache__/*
 evaluation/__pycache__/*
+objectDetection/__pycache__/*
+*.pt
+*.pyc
+*.png
+!public/images/*.png
