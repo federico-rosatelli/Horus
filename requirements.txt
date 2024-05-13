@@ -5,3 +5,6 @@ ultralyticsplus
 scikit-image
 scipy
 uuid
+torch
+torchvision
+pillow
