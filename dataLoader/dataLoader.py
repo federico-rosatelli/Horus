@@ -13,6 +13,7 @@ class AVS1KDataloader:
     def __getitem__(self,i:int):
         videospath = self.video_Frame_List[i]
         video = []
+        video_resize = []
         for imgpath in sorted(glob(videospath+"/*")):
             # img = cv2.imread(imgpath)
             # img = cv2.resize(img, dsize = (256, 256))
@@ -20,21 +21,30 @@ class AVS1KDataloader:
             # img = torch.from_numpy(img.astype(np.float32)).clone()
             #img = img.permute(2, 0, 1)
             im = Image.open(imgpath)
-            im = im.resize((256,256))
             img = pil_to_tensor(im)
             img = img.permute(2, 0, 1)
             video.append(img)
+
+            im_resize = im.resize((256,256))
+            img_resize = pil_to_tensor(im_resize)
+            img_resize = img_resize.permute(2, 0, 1)
+            video_resize.append(img_resize)
         
         labelspaths = self.video_Ground_List[i]
         label = []
+        label_resize = []
         for labelspath in sorted(glob(labelspaths+"/*")):
             im = Image.open(labelspath)
-            im = im.resize((256,256))
             img = pil_to_tensor(im)
             img = img.permute(2, 0, 1)
             label.append(img)
 
-        return video,label
+            im_resize = im.resize((256,256))
+            img_resize = pil_to_tensor(im_resize)
+            img_resize = img_resize.permute(2, 0, 1)
+            label_resize.append(img_resize)
+
+        return (video,video_resize),(label,label_resize)
     
     def __len__(self) -> int:
         return len(self.video_Frame_List)
