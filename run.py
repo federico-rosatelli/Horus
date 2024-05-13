@@ -3,7 +3,7 @@
 from objectDetection import visDrone
 
 
-m = visDrone.VisDroneModel()
+m = visDrone.VisDroneModel(device="cpu")
 
 
 import cv2 
@@ -16,7 +16,12 @@ cap = cv2.VideoCapture('test_video.mp4')
 if (cap.isOpened()== False):
     print("Error opening video file") 
 res = []
+img = cv2.imread("testss/frame0001.png")
+h,w,_ = img.shape
+
+video=cv2.VideoWriter('video_res.avi',-1,20,(w,h))
 # Read until video is completed 
+count = 0
 while(cap.isOpened()): 
       
 # Capture frame-by-frame 
@@ -24,14 +29,15 @@ while(cap.isOpened()):
     if ret == True: 
     # Display the resulting frame 
         #cv2.imshow('Frame', frame)
-        result = m.predicted(frame)
-        print(result)
+        result,_ = m.predictImage(frame)
+        #print(result)
         res.append(result)
-          
+        video.write(result)
+        cv2.imwrite("testss/video/frame%d.png" % count, result)
     # Press Q on keyboard to exit 
         if cv2.waitKey(25) & 0xFF == ord('q'): 
             break
-  
+        count += 1
 # Break the loop 
     else: 
         break
@@ -40,7 +46,8 @@ while(cap.isOpened()):
 # the video capture object 
 cap.release() 
 
-print(res)
+cv2.destroyAllWindows()
+video.release()
 # d = Displayer(item=146,nframe=27)
 # d.show()
 # # d = Displayer()
