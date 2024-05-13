@@ -5,4 +5,5 @@ objectDetection/__pycache__/*
 *.pt
 *.pyc
 *.png
+*.mp4
 !public/images/*.png
