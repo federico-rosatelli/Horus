@@ -8,6 +8,7 @@ import torch.optim as optim
 import torchvision
 from torchvision import transforms
 import segmentation_models_pytorch as smp
+import numpy as np
 
 
 
@@ -51,18 +52,25 @@ class Horus(nn.Module):
         
         #x = self.relu(x)
         #print(x.shape)
-        x = self.max16(x)
-        #print(x.shape)
+
+        
+        #x = self.max16(x)
 
         
 
         x = self.conv32(x)
+        #print(x.shape)
         #x = self.relu(x)
 
         #print(x.shape)
-        x = x.unsqueeze(3)
-        x = self.max32(x)
-        x = x.squeeze(3)
+        #x = x.unsqueeze(3)
+        #print(x.shape)
+
+
+        #x = self.max32(x)
+
+
+        #x = x.squeeze(3)
         #print(x.shape)
 
         x = self.conv64(x)
@@ -94,58 +102,96 @@ def trainHorus(epoch):
     device = torch.device("cpu")
     model = model.to(device)
 
-    learning_rate = 0.001
-    loss_fn = nn.MSELoss()
+    learning_rate = 0.005
+    loss_fn = nn.HingeEmbeddingLoss()
 
     optimizer = torch.optim.Adam(model.parameters(),learning_rate)
     min_loss = 0
     model.train()
     print(len(train))
     for k in range(epoch):
-        mean = 0
-        print(f"{k} EPOCH")
-        for i in range(len(train)):
-            for x,y,z in train:
-                # for i in range(len(x)):
-                #     x[i] = x[i].to(device)
-                #     y[i] = y[i].to(device)
-                x = x.to(device)
-                y = y.to(device)
+        for img,label,name in train:
+            mean = 0
+            #print(len(img),name)
+            for i in range(len(img)):
+                if i == len(img)-1:
+                    print(f"mean loss: {mean/(i+1)}")
+                    continue
+                x_spatial = img[i]
+                y_spatial = label[i]
+                x_temporal = [img[i],img[i+1]]
+                y_temporal = [label[i],label[i+1]]
+                #print(x_spatial.shape)
+                x_spatial = x_spatial.to(device)
+                y_spatial = y_spatial.to(device)
+                pre_spatial = model(x_spatial)
 
-                pred = model(x)
-                #print(pred.shape,y.shape)
-                loss = loss_fn(pred,y)
-
+                loss = loss_fn(pre_spatial,y_spatial)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
                 loss = loss.item()
                 mean += loss
+                
+                if loss>0.999965:
+                    print(f"loss saved: {loss} for {name}")
+                    show(pre_spatial,y_spatial,loss)
+                    print("QUANTI 0? ",np.count_nonzero(pre_spatial==0),np.count_nonzero(pre_spatial!=0))
                 if loss > min_loss:
                     min_loss = loss
                     print(f"{loss} in: {i}")
-                    print(f"mean loss: {mean/(i+1)}")
-                    # if loss>0.06:
-                    #     show(pred,y)
+                    
+                    if loss>0.03:
+                        show(pre_spatial,y_spatial,loss)
+               
+
+
+            
+    # for k in range(epoch):
+    #     mean = 0
+    #     print(f"{k} EPOCH")
+    #     for i in range(len(train)):
+    #         for x,y,z in train:
+    #             # for i in range(len(x)):
+    #             #     x[i] = x[i].to(device)
+    #             #     y[i] = y[i].to(device)
+    #             x = x.to(device)
+    #             y = y.to(device)
+
+    #             pred = model(x)
+    #             #print(pred.shape,y.shape)
+    #             loss = loss_fn(pred,y)
+
+    #             optimizer.zero_grad()
+    #             loss.backward()
+    #             optimizer.step()
+    #             loss = loss.item()
+    #             mean += loss
+    #             if loss > min_loss:
+    #                 min_loss = loss
+    #                 print(f"{loss} in: {i}")
+    #                 print(f"mean loss: {mean/(i+1)}")
+    #                 # if loss>0.06:
+    #                 #     show(pred,y)
 
         print(f"mean loss: {mean/len(train)}")
 
 
 
-def show(img,label)->None:
+def show(img,label,loss)->None:
     fig, axarr = plt.subplots(1,2)
-    print(type(img))
-    axarr[0].imshow(img.detach().numpy().reshape(256,256,3))
+    
+    axarr[0].imshow((img*255).detach().numpy().reshape(256,256,3))
     axarr[0].set_title('Image')
     axarr[0].axis('off')
 
-    axarr[1].imshow(label.permute(2,0,1))
+    axarr[1].imshow((label*255).detach().numpy().reshape(256,256,1))
     axarr[1].set_title('Label')
     axarr[1].axis('off')
 
     #fig.suptitle(f'Image & Label of {self.type}/{self.item} on Frame:{self.nframe}', fontsize=10)
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f"testss/img/test.png")
 
 
 
