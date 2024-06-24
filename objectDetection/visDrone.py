@@ -1,10 +1,10 @@
 #pip install ultralyticsplus ultralytics
+import warnings
+warnings.simplefilter("ignore", UserWarning)
 from evaluation.printer import Printer
 from ultralyticsplus import YOLO, render_result
 import cv2
 import numpy as np
-import warnings
-warnings.simplefilter("ignore", UserWarning)
 
 
 
@@ -16,7 +16,7 @@ class VisDroneModel:
         self.model.overrides['agnostic_nms'] = agnostic_nms
         self.model.overrides['max_det'] = max_det
 
-        self.model = self.model.cpu() if device == "cpu" else self.model.cuda()
+        self.model = self.model.cpu() #if device == "cpu" else self.model.cuda()
 
         self.predicted = []
         

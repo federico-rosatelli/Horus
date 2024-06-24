@@ -14,22 +14,23 @@ class Eval:
         self.b3 = b3
         self.b4 = b4
         self.already_seen = []
-        self.next_obj = []
+        self.next_obj:list[borderEval.Segment] = []
         self.printer = None
         pass
 
-    def newEval(self,png_file) ->None:
+    def newEval(self,png_file) -> list[borderEval.Segment]:
         data = borderEval.borderSegments(png_file)
         if len(data) == 0:
-            return f"Cannot find an object in image {png_file}"
-        for d in data:
-            evalP = self.getEvaluationPoint(data[d])
-            data[d]["id"] = d
-            data[d]["file_name"] = png_file
-            data[d]["points"] = evalP
-            data[d]["pointVect"] = math.sqrt(sum([d**2 for d in evalP]))
-            self.next_obj.append(data[d])
-        return
+            raise Exception(f"Cannot find an object in image {type(png_file)}")
+        segments:list[borderEval.Segment] = []
+        for segment in data:
+            evalP = self.getEvaluationPoint(segment())
+            #data[d]["file_name"] = png_file
+            segment.addData("points",evalP)
+            segment.addData("pointVect",math.sqrt(sum([d**2 for d in evalP])))
+            self.next_obj.append(segment)
+            segments.append(segment)
+        return segments
 
     def getEvaluationPoint(self,eval_points:dict) ->list:
         evals = [
@@ -73,16 +74,24 @@ class Eval:
         ]
         return evals
     
-    def getNextObj(self) -> dict:
-        m_vect = max(self.next_obj, key=lambda x:x['pointVect'])
+    def getNextObj(self) -> borderEval.Segment:
+        m_vect = max(self.next_obj, key=lambda x:x.get('pointVect'))
         
         self.already_seen.append(m_vect)
         for i in range(len(self.next_obj)):
-            if self.next_obj[i]["id"] == m_vect["id"]:
+            if str(self.next_obj[i]) == str(m_vect):
                 self.next_obj.pop(i)
                 break
-        self.printer = printer.Printer(m_vect)
+        self.printer = printer.Printer(m_vect())
         return m_vect
+    
+    def delObj(self,objs) -> None:
+        for obj in objs:
+            for i in range(len(self.next_obj)):
+                if str(obj) == str(self.next_obj[i]):
+                    self.next_obj.pop(i)
+                    break
+        return 
     
     def showImage(self) -> None:
         if not self.printer:

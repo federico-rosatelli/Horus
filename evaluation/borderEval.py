@@ -7,8 +7,48 @@ import skimage.exposure
 import scipy.ndimage as ndi
 
 
-def borderSegments(png_file:str) -> dict:
-    img = cv2.imread(png_file)
+
+
+class Segment:
+    def __init__(self,dictSegm)->None:
+        self.dictSegm = dictSegm
+        self.id = str(uuid4())
+    
+    def __str__(self):
+        return self.id
+    
+    def __call__(self):
+        return self.dictSegm
+    
+    
+    def __len__(self):
+        return self.dictSegm["area"]
+    
+    def size(self):
+        return self.dictSegm["size"]
+    
+    def addData(self,name:str,obj:any) -> None:
+        self.dictSegm[name] = obj
+    
+    def bwImage(self):
+        return self.dictSegm["bwImage"]
+    
+    def contours(self):
+        return self.dictSegm["contours"]
+    
+    def gaussianDiff(self):
+        return self.dictSegm["gaussianDiff"]
+    
+    def dominantColor(self):
+        return self.dictSegm["dominantColor"]
+    
+    def get(self,name):
+        if name not in self.dictSegm:
+            raise Exception(f"Key name {name} not in Segment object {self.id}")
+        return self.dictSegm[name]
+    
+def borderSegments(img) -> list[Segment]:
+    #img = cv2.imread(png_file)
 
     h,w,_ = img.shape
 
@@ -18,7 +58,7 @@ def borderSegments(png_file:str) -> dict:
     contours, _ = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     minArea = ((h*w)/100)*0.8
 
-    contObj = {}
+    segments = []
     for con in contours:
         blank_image = np.zeros((h,w,3), np.uint8)
         cv2.drawContours(blank_image, [con], -1, (255, 255, 255), thickness=cv2.FILLED)
@@ -26,20 +66,20 @@ def borderSegments(png_file:str) -> dict:
 
         if area > minArea:
             masked = cv2.bitwise_and(blank_image,img)
-            contObj[str(uuid4())] = {
+            contObj = {
                 "contours" : con,
                 "img":img,
                 "area" : area,
+                "size": (h,w),
                 "totArea": h*w,
                 "bwImage": blank_image,
                 "gaussianDiff":gaussianBorder(blank_image),
                 "symmetry":objectSymmetry(blank_image,con),
                 "dominantColor":dominantColor(masked)
             }
+            segments.append(Segment(contObj))
 
-    return contObj
-
-
+    return segments
 
 def gaussianBorder(img):
     blur = cv2.GaussianBlur(img, (0,0), sigmaX=20, sigmaY=20, borderType = cv2.BORDER_DEFAULT)
