@@ -9,6 +9,7 @@ import torchvision
 from torchvision import transforms
 import segmentation_models_pytorch as smp
 import numpy as np
+import cv2
 
 
 
@@ -18,9 +19,9 @@ valid = dtL.newLoader(ROOT_DIR,VALID_SET)
 test = dtL.newLoader(ROOT_DIR,TEST_SET)
 
 
-class Horus(nn.Module):
+class HorusModel(nn.Module):
     def __init__(self):
-        super(Horus, self).__init__()
+        super(HorusModel, self).__init__()
 
         # Define the layers for your model
         self.conv16 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
@@ -50,28 +51,17 @@ class Horus(nn.Module):
         x = self.relu(x)
         x = self.conv256_16(x)
         
-        #x = self.relu(x)
-        #print(x.shape)
 
         
-        #x = self.max16(x)
+        x = self.max16(x)
 
         
 
         x = self.conv32(x)
-        #print(x.shape)
-        #x = self.relu(x)
-
-        #print(x.shape)
-        #x = x.unsqueeze(3)
-        #print(x.shape)
 
 
-        #x = self.max32(x)
+        x = self.max32(x)
 
-
-        #x = x.squeeze(3)
-        #print(x.shape)
 
         x = self.conv64(x)
         x = self.relu(x)
@@ -83,13 +73,7 @@ class Horus(nn.Module):
         x = self.conv256(x)
         #print(x.shape)
         x = self.relu(x)
-        #x = x.reshape()
 
-        # x = x.unsqueeze(2)
-        # print(x.shape)
-        # #x = self.upsample_layer(x)
-        # x = self.max256(x)
-        # x = x.squeeze(2)
         return x
 
 # Lsp = u * Ls * ()
@@ -97,13 +81,37 @@ class Horus(nn.Module):
 # model = Horus()
 # model.to(device)
     
+class Horus:
+    HOME_PATH:str = "saliencyDetection/"
+    model:HorusModel = None
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    def __init__(self,model_file:str="horus_model.pt",state_dict:bool=False) -> None:
+        super(Horus,self).__init__()
+
+        model_file = self.HOME_PATH+model_file
+
+        if state_dict:
+            self.model = HorusModel()
+            self.model.load_state_dict(torch.load(model_file))
+        else:
+            self.model = torch.load(model_file)
+        
+        self.model.to(self.device)
+        self.model.eval()
+    
+    def predict(self,img:any) -> np.ndarray:
+        img = img.to(self.device)
+        pred = self.model(img)
+        return pred.detach().cpu().numpy()
+
+
 def trainHorus(epoch):
-    model = Horus()
+    model = HorusModel()
     device = torch.device("cpu")
     model = model.to(device)
 
-    learning_rate = 0.005
-    loss_fn = nn.HingeEmbeddingLoss()
+    learning_rate = 0.0001
+    loss_fn = nn.MSELoss()
 
     optimizer = torch.optim.Adam(model.parameters(),learning_rate)
     min_loss = 0
@@ -113,10 +121,8 @@ def trainHorus(epoch):
         for img,label,name in train:
             mean = 0
             #print(len(img),name)
-            for i in range(len(img)):
-                if i == len(img)-1:
-                    print(f"mean loss: {mean/(i+1)}")
-                    continue
+            for i in range(len(img)-1):
+                
                 x_spatial = img[i]
                 y_spatial = label[i]
                 x_temporal = [img[i],img[i+1]]
@@ -133,16 +139,16 @@ def trainHorus(epoch):
                 loss = loss.item()
                 mean += loss
                 
-                if loss>0.999965:
+                if loss>0.02:
                     print(f"loss saved: {loss} for {name}")
-                    show(pre_spatial,y_spatial,loss)
-                    print("QUANTI 0? ",np.count_nonzero(pre_spatial==0),np.count_nonzero(pre_spatial!=0))
+                    show(pre_spatial,y_spatial,img[i])
+                    #print("QUANTI 0? ",np.count_nonzero(pre_spatial==0),np.count_nonzero(pre_spatial!=0))
                 if loss > min_loss:
                     min_loss = loss
                     print(f"{loss} in: {i}")
                     
-                    if loss>0.03:
-                        show(pre_spatial,y_spatial,loss)
+                    # if loss>0.03:
+                    #     show(pre_spatial,y_spatial,loss)
                
 
 
@@ -178,16 +184,37 @@ def trainHorus(epoch):
 
 
 
-def show(img,label,loss)->None:
+
+def show(img,label,img1)->None:
+    
+    # # print(img)
+    # #image = (255.0 * img).to(torch.uint8)
+    # print(type(img))
+    image = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
+    # # print(image.shape)
+    # image = image[:, :, :, ::-1]
+    # print(image.shape)
+    #cv2.imwrite("testss/img/test.png",image)
+
+
+    #np.save("testss/img/test.png", img.detach().cpu().numpy())
     fig, axarr = plt.subplots(1,2)
     
-    axarr[0].imshow((img*255).detach().numpy().reshape(256,256,3))
+    grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
+    grayscale_tensor = grayscale_transform(torch.from_numpy(np.array(image)).float())
+    #grayscale_tensor = torch.from_numpy(np.array(image)).float().squeeze(0)
+    
+    axarr[0].imshow(grayscale_tensor.detach().numpy().reshape(256,256,1))
     axarr[0].set_title('Image')
     axarr[0].axis('off')
 
     axarr[1].imshow((label*255).detach().numpy().reshape(256,256,1))
     axarr[1].set_title('Label')
     axarr[1].axis('off')
+
+    # axarr[2].imshow((img1).detach().numpy().reshape(256,256,-1))
+    # axarr[2].set_title('Original Img')
+    # axarr[2].axis('off')
 
     #fig.suptitle(f'Image & Label of {self.type}/{self.item} on Frame:{self.nframe}', fontsize=10)
     plt.tight_layout()

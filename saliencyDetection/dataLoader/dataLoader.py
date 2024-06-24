@@ -96,7 +96,7 @@ class AVS1KDataSet:
 
 
 
-def newLoader(rootDir:str, runType:str) -> AVS1KDataSet:
+def newLoader(rootDir:str, runType:str) -> DataLoader:
     if runType.lower() == "test":
         subDir = "testSet"
     elif runType.lower() == "valid":
@@ -115,7 +115,7 @@ class Displayer:
         length = len(glob(f"{loader}/{type}/Frame/*"))
         self.item = random.randint(0,length) if item < 0 else item if item < length else length - 1
         #self.item = self.item if self.item < length else length - 1
-        self.dataloader = AVS1KDataloader(loader,type)
+        self.dataloader = AVS1KDataSet(loader,type)
         self.image,self.label = self.dataloader.__getitem__(self.item)
         self.nframe = random.randint(0,len(self.image)) if nframe < 0 else nframe if nframe < len(self.image) else len(self.image)-1
         #self.nframe = self.nframe if self.nframe < len(self.image) else len(self.image)-1

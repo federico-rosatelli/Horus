@@ -2,6 +2,9 @@
 dataLoader/__pycache__/*
 evaluation/__pycache__/*
 objectDetection/__pycache__/*
+saliencyDetection/__pycache__/*
+wrapper/__pycache__/*
+tester/__pycache__/*
 *.pt
 *.pyc
 *.png
