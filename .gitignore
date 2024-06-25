@@ -9,4 +9,6 @@ tester/__pycache__/*
 *.pyc
 *.png
 *.mp4
+*.log
 !public/images/*.png
+!logs/*.log

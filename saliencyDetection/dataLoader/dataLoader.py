@@ -6,6 +6,45 @@ import random
 from torchvision.transforms.functional import pil_to_tensor
 from torch.utils.data import DataLoader
 
+
+class AVS1KDataSetTeacher:
+    def __init__(self,rootDir,subDir) -> None:
+        video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
+        video_Ground_List = sorted(glob(f"{rootDir}/{subDir}/Ground/*"))
+
+        self.all_Video_Frame = []
+        for video in video_Frame_List:
+            self.all_Video_Frame += sorted(glob(f"{video}/*"))
+        
+        self.all_Video_Ground = []
+        for ground in video_Ground_List:
+            self.all_Video_Ground += sorted(glob(f"{ground}/*"))
+    
+    def __len__(self):
+        return len(self.all_Video_Frame)
+    
+    def __getitem__(self,i):
+        videoPath = self.all_Video_Frame[i]
+        groundPath = self.all_Video_Ground[i]
+        
+        imgFrame = Image.open(videoPath)
+        imgGround = Image.open(groundPath)
+
+        imgFrame = imgFrame.resize((1280,720))
+        imgGround = imgGround.resize((1280,720))
+
+        imgFrame = pil_to_tensor(imgFrame)
+        imgGround = pil_to_tensor(imgGround)
+
+        imgFrame = imgFrame.permute(2, 0, 1)
+        imgGround = imgGround.permute(2, 0, 1)
+
+        return imgFrame/255,imgGround/255
+
+
+
+
+
 class AVS1KDataSet:
 
     def __init__(self,rootDir,subDir) -> None:
@@ -94,7 +133,14 @@ class AVS1KDataSet:
     #     self.images_path = sorted(glob(videosPath+"/*"))
     #     self.labels_path = sorted(glob(labelPath+"/*"))
 
-
+def newTeacherLoader(rootDir:str, runType:str) ->DataLoader:
+    if runType.lower() == "test":
+        subDir = "testSet"
+    elif runType.lower() == "valid":
+        subDir = "validSet"
+    else:
+        subDir = "trainSet"
+    return DataLoader(AVS1KDataSetTeacher(rootDir,subDir), shuffle=True)
 
 def newLoader(rootDir:str, runType:str) -> DataLoader:
     if runType.lower() == "test":

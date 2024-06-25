@@ -11,12 +11,55 @@ import segmentation_models_pytorch as smp
 import numpy as np
 import cv2
 
+import logging
+
+logging.getLogger("PIL.PngImagePlugin").propagate = False
+logging.getLogger("matplotlib.font_manager").propagate = False
 
 
 
 train = dtL.newLoader(ROOT_DIR,TRAIN_SET)
 valid = dtL.newLoader(ROOT_DIR,VALID_SET)
 test = dtL.newLoader(ROOT_DIR,TEST_SET)
+
+trainT = dtL.newTeacherLoader(ROOT_DIR,TRAIN_SET)
+validT = dtL.newTeacherLoader(ROOT_DIR,VALID_SET)
+testT = dtL.newTeacherLoader(ROOT_DIR,TEST_SET)
+
+
+class HorusModelTeacher(nn.Module):
+    def __init__(self):
+        super(HorusModelTeacher,self).__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1280, 256, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=1, stride=2),
+            nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(512, 1024, kernel_size=3, padding=1),
+            nn.ReLU()
+        )
+        
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2),
+            nn.ReLU(),
+            nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),
+            nn.ReLU(),
+            nn.Conv2d(256, 1280, kernel_size=3, padding=1),
+            nn.ReLU()
+        )
+        
+    def forward(self, x):
+        x = self.encoder(x)
+        x = self.decoder(x)
+        return x
+
+
+
+
 
 
 class HorusModel(nn.Module):
@@ -46,7 +89,7 @@ class HorusModel(nn.Module):
 
 
     def forward(self, x):
-        
+        print(x.size)
         x = self.conv16(x)
         x = self.relu(x)
         x = self.conv256_16(x)
@@ -105,7 +148,42 @@ class Horus:
         return pred.detach().cpu().numpy()
 
 
-def trainHorus(epoch):
+def trainTeacher(epoch:int=10,verbose:str|None=None):
+    if verbose:
+        logger = logging.getLogger(verbose)
+    
+    model = HorusModelTeacher()
+    device = torch.device("cpu")
+    model = model.to(device)
+
+    learning_rate = 0.0001
+    loss_fn = nn.MSELoss()
+
+    optimizer = torch.optim.Adam(model.parameters(),learning_rate)
+
+    model.train()
+    for k in range(epoch):
+        for img,label in trainT:
+            x = img.to(device)
+            y = label.to(device)
+
+            predict = model(x)
+            print(predict.size(),y.size())
+            loss = loss_fn(predict,y)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            loss = loss.item()
+            #logger.info(loss)
+            if loss>0.02:
+                    if verbose:
+                        logger.info(f"Loss: {loss}")
+                    show(predict,y)
+
+
+def trainHorus(epoch:int=10,verbose:str|None=None):
+    if verbose:
+        logger = logging.getLogger(verbose)
     model = HorusModel()
     device = torch.device("cpu")
     model = model.to(device)
@@ -116,7 +194,6 @@ def trainHorus(epoch):
     optimizer = torch.optim.Adam(model.parameters(),learning_rate)
     min_loss = 0
     model.train()
-    print(len(train))
     for k in range(epoch):
         for img,label,name in train:
             mean = 0
@@ -140,12 +217,14 @@ def trainHorus(epoch):
                 mean += loss
                 
                 if loss>0.02:
-                    print(f"loss saved: {loss} for {name}")
+                    if verbose:
+                        logger.info(f"loss saved: {loss} for {name[0]}")
                     show(pre_spatial,y_spatial,img[i])
                     #print("QUANTI 0? ",np.count_nonzero(pre_spatial==0),np.count_nonzero(pre_spatial!=0))
                 if loss > min_loss:
                     min_loss = loss
-                    print(f"{loss} in: {i}")
+                    if verbose:
+                        logger.info(f"{loss} in: {i}")
                     
                     # if loss>0.03:
                     #     show(pre_spatial,y_spatial,loss)
@@ -179,17 +258,18 @@ def trainHorus(epoch):
     #                 print(f"mean loss: {mean/(i+1)}")
     #                 # if loss>0.06:
     #                 #     show(pred,y)
-
-        print(f"mean loss: {mean/len(train)}")
-
-
+        if verbose:
+            logger.warning(f"mean loss: {mean/len(train)}")
 
 
-def show(img,label,img1)->None:
+
+
+def show(img,label)->None:
     
     # # print(img)
     # #image = (255.0 * img).to(torch.uint8)
     # print(type(img))
+    #print(img.size(),label.size())
     image = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
     # # print(image.shape)
     # image = image[:, :, :, ::-1]
@@ -204,7 +284,7 @@ def show(img,label,img1)->None:
     grayscale_tensor = grayscale_transform(torch.from_numpy(np.array(image)).float())
     #grayscale_tensor = torch.from_numpy(np.array(image)).float().squeeze(0)
     
-    axarr[0].imshow(grayscale_tensor.detach().numpy().reshape(256,256,1))
+    axarr[0].imshow(grayscale_tensor.detach().numpy().reshape(720,1280,1))
     axarr[0].set_title('Image')
     axarr[0].axis('off')
 
@@ -219,6 +299,7 @@ def show(img,label,img1)->None:
     #fig.suptitle(f'Image & Label of {self.type}/{self.item} on Frame:{self.nframe}', fontsize=10)
     plt.tight_layout()
     plt.savefig(f"testss/img/test.png")
+    plt.close(fig)
 
 
 
