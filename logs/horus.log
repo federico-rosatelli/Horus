@@ -1,0 +1,346 @@
+2024-06-26 14:29:40.472 - staging - trainTeacher - WARNING - Min Loss: 0.020054444670677185 at 0
+2024-06-26 14:29:43.280 - staging - trainTeacher - WARNING - Min Loss: 0.016158578917384148 at 5
+2024-06-26 14:29:44.360 - staging - trainTeacher - WARNING - Min Loss: 0.014464091509580612 at 8
+2024-06-26 14:29:45.429 - staging - trainTeacher - WARNING - Min Loss: 0.013519558124244213 at 11
+2024-06-26 14:29:49.874 - staging - trainTeacher - WARNING - Min Loss: 0.012360172346234322 at 23
+2024-06-26 14:29:52.101 - staging - trainTeacher - WARNING - Min Loss: 0.010544629767537117 at 29
+2024-06-26 14:29:58.476 - staging - trainTeacher - WARNING - Min Loss: 0.010311811231076717 at 46
+2024-06-26 14:30:11.624 - staging - trainTeacher - WARNING - Min Loss: 0.009570176713168621 at 80
+2024-06-26 14:30:19.117 - staging - trainTeacher - INFO - Mean Loss: 0.018622220125012467 - Mean Batch Loss: 0.018622220125012467. 100 to 74195
+2024-06-26 14:30:19.762 - staging - trainTeacher - INFO - Saving batch 100 in model
+2024-06-26 14:30:59.129 - staging - trainTeacher - INFO - Mean Loss: 0.018279617568895 - Mean Batch Loss: 0.017933588987216354. 200 to 74195
+2024-06-26 14:30:59.536 - staging - trainTeacher - INFO - Saving batch 200 in model
+2024-06-26 14:31:10.876 - staging - trainTeacher - WARNING - Min Loss: 0.009483649395406246 at 231
+2024-06-26 14:31:36.924 - staging - trainTeacher - INFO - Mean Loss: 0.01821242306579486 - Mean Batch Loss: 0.018077362114563584. 300 to 74195
+2024-06-26 14:31:43.325 - staging - trainTeacher - WARNING - Min Loss: 0.008815349079668522 at 317
+2024-06-26 14:32:14.504 - staging - trainTeacher - INFO - Mean Loss: 0.017845526425878604 - Mean Batch Loss: 0.016741167539730668. 400 to 74195
+2024-06-26 14:32:14.869 - staging - trainTeacher - INFO - Saving batch 400 in model
+2024-06-26 14:32:52.035 - staging - trainTeacher - INFO - Mean Loss: 0.017793088552807857 - Mean Batch Loss: 0.017582812681794166. 500 to 74195
+2024-06-26 14:33:28.676 - staging - trainTeacher - INFO - Mean Loss: 0.017490847640594904 - Mean Batch Loss: 0.01597662067040801. 600 to 74195
+2024-06-26 14:33:29.149 - staging - trainTeacher - INFO - Saving batch 600 in model
+2024-06-26 14:34:01.945 - staging - trainTeacher - WARNING - Min Loss: 0.008745904080569744 at 689
+2024-06-26 14:34:06.144 - staging - trainTeacher - INFO - Mean Loss: 0.017405903771966057 - Mean Batch Loss: 0.01689539112150669. 700 to 74195
+2024-06-26 14:34:42.980 - staging - trainTeacher - INFO - Mean Loss: 0.01740035746181465 - Mean Batch Loss: 0.01736147782765329. 800 to 74195
+2024-06-26 14:35:19.887 - staging - trainTeacher - INFO - Mean Loss: 0.01731560048704076 - Mean Batch Loss: 0.016636697119101884. 900 to 74195
+2024-06-26 14:35:57.634 - staging - trainTeacher - INFO - Mean Loss: 0.017222337123308028 - Mean Batch Loss: 0.016382034216076136. 1000 to 74195
+2024-06-26 14:36:35.366 - staging - trainTeacher - INFO - Mean Loss: 0.017133024601531398 - Mean Batch Loss: 0.016239006258547305. 1100 to 74195
+2024-06-26 14:37:13.164 - staging - trainTeacher - INFO - Mean Loss: 0.01712244754962679 - Mean Batch Loss: 0.01700599420815706. 1200 to 74195
+2024-06-26 14:37:18.864 - staging - trainTeacher - WARNING - Min Loss: 0.0084917563945055 at 1215
+2024-06-26 14:37:57.211 - staging - trainTeacher - INFO - Mean Loss: 0.017091891037545052 - Mean Batch Loss: 0.01672490732744336. 1300 to 74195
+2024-06-26 14:38:54.561 - staging - trainTeacher - INFO - Mean Loss: 0.017015781197072054 - Mean Batch Loss: 0.016025592172518373. 1400 to 74195
+2024-06-26 14:39:33.707 - staging - trainTeacher - INFO - Mean Loss: 0.01697105888666946 - Mean Batch Loss: 0.01634449931792915. 1500 to 74195
+2024-06-26 14:40:10.896 - staging - trainTeacher - INFO - Mean Loss: 0.01690416660701983 - Mean Batch Loss: 0.015900113489478826. 1600 to 74195
+2024-06-26 14:40:11.446 - staging - trainTeacher - INFO - Saving batch 1600 in model
+2024-06-26 14:40:48.381 - staging - trainTeacher - INFO - Mean Loss: 0.016840200002323277 - Mean Batch Loss: 0.0158160946611315. 1700 to 74195
+2024-06-26 14:40:48.853 - staging - trainTeacher - INFO - Saving batch 1700 in model
+2024-06-26 14:41:27.906 - staging - trainTeacher - INFO - Mean Loss: 0.016819518039841774 - Mean Batch Loss: 0.016467717858031392. 1800 to 74195
+2024-06-26 14:41:50.011 - staging - trainTeacher - WARNING - Min Loss: 0.00835007056593895 at 1859
+2024-06-26 14:42:05.812 - staging - trainTeacher - INFO - Mean Loss: 0.016756576305644283 - Mean Batch Loss: 0.015622995672747492. 1900 to 74195
+2024-06-26 14:42:06.313 - staging - trainTeacher - INFO - Saving batch 1900 in model
+2024-06-26 14:42:43.911 - staging - trainTeacher - INFO - Mean Loss: 0.016748936587608586 - Mean Batch Loss: 0.016603705547749995. 2000 to 74195
+2024-06-26 14:42:55.527 - staging - trainTeacher - WARNING - Min Loss: 0.008164960891008377 at 2030
+2024-06-26 14:43:20.393 - staging - trainTeacher - WARNING - Min Loss: 0.008139550685882568 at 2098
+2024-06-26 14:43:21.091 - staging - trainTeacher - INFO - Mean Loss: 0.01670409668580953 - Mean Batch Loss: 0.015806850250810384. 2100 to 74195
+2024-06-26 14:43:58.432 - staging - trainTeacher - INFO - Mean Loss: 0.016663148911201863 - Mean Batch Loss: 0.01580283616669476. 2200 to 74195
+2024-06-26 14:44:35.280 - staging - trainTeacher - INFO - Mean Loss: 0.01667706277755707 - Mean Batch Loss: 0.01698330697603524. 2300 to 74195
+2024-06-26 14:45:13.765 - staging - trainTeacher - INFO - Mean Loss: 0.016626916193899416 - Mean Batch Loss: 0.01547304330393672. 2400 to 74195
+2024-06-26 14:45:14.224 - staging - trainTeacher - INFO - Saving batch 2400 in model
+2024-06-26 14:45:52.428 - staging - trainTeacher - INFO - Mean Loss: 0.016584036016806226 - Mean Batch Loss: 0.015554482964798808. 2500 to 74195
+2024-06-26 14:46:30.687 - staging - trainTeacher - INFO - Mean Loss: 0.01658284797962298 - Mean Batch Loss: 0.016553135169669986. 2600 to 74195
+2024-06-26 14:47:07.975 - staging - trainTeacher - INFO - Mean Loss: 0.016595820499110313 - Mean Batch Loss: 0.016933235730975868. 2700 to 74195
+2024-06-26 14:47:44.896 - staging - trainTeacher - INFO - Mean Loss: 0.016599382914573496 - Mean Batch Loss: 0.01669560375623405. 2800 to 74195
+2024-06-26 14:48:22.488 - staging - trainTeacher - INFO - Mean Loss: 0.016582380340430438 - Mean Batch Loss: 0.016106138238683343. 2900 to 74195
+2024-06-26 14:49:00.579 - staging - trainTeacher - INFO - Mean Loss: 0.01660490881804326 - Mean Batch Loss: 0.017258459953591227. 3000 to 74195
+2024-06-26 14:49:37.972 - staging - trainTeacher - INFO - Mean Loss: 0.01658367583247653 - Mean Batch Loss: 0.015946473935618998. 3100 to 74195
+2024-06-26 14:50:15.529 - staging - trainTeacher - INFO - Mean Loss: 0.0165784144366753 - Mean Batch Loss: 0.016415258552879095. 3200 to 74195
+2024-06-26 14:50:53.488 - staging - trainTeacher - INFO - Mean Loss: 0.016581395701345838 - Mean Batch Loss: 0.016676825983449817. 3300 to 74195
+2024-06-26 14:50:56.252 - staging - trainTeacher - WARNING - Min Loss: 0.007993425242602825 at 3307
+2024-06-26 14:51:31.383 - staging - trainTeacher - INFO - Mean Loss: 0.016560372078538783 - Mean Batch Loss: 0.01586638228967786. 3400 to 74195
+2024-06-26 14:52:09.530 - staging - trainTeacher - INFO - Mean Loss: 0.016556241642657142 - Mean Batch Loss: 0.01641576551832259. 3500 to 74195
+2024-06-26 14:52:47.751 - staging - trainTeacher - INFO - Mean Loss: 0.016566690298816838 - Mean Batch Loss: 0.01693249775096774. 3600 to 74195
+2024-06-26 14:53:25.381 - staging - trainTeacher - INFO - Mean Loss: 0.016560644907607593 - Mean Batch Loss: 0.016342950370162725. 3700 to 74195
+2024-06-26 14:53:29.614 - staging - trainTeacher - WARNING - Min Loss: 0.007302799262106419 at 3711
+2024-06-26 14:54:03.738 - staging - trainTeacher - INFO - Mean Loss: 0.016554012236505614 - Mean Batch Loss: 0.016308537079021336. 3800 to 74195
+2024-06-26 14:54:43.374 - staging - trainTeacher - INFO - Mean Loss: 0.016567561212975805 - Mean Batch Loss: 0.017082557808607818. 3900 to 74195
+2024-06-26 14:55:20.910 - staging - trainTeacher - INFO - Mean Loss: 0.01655707875174959 - Mean Batch Loss: 0.01614815793931484. 4000 to 74195
+2024-06-26 14:56:00.734 - staging - trainTeacher - INFO - Mean Loss: 0.016533591040114648 - Mean Batch Loss: 0.015593847697600723. 4100 to 74195
+2024-06-26 14:56:39.893 - staging - trainTeacher - INFO - Mean Loss: 0.016522610543654438 - Mean Batch Loss: 0.01607230038382113. 4200 to 74195
+2024-06-26 14:57:18.007 - staging - trainTeacher - INFO - Mean Loss: 0.016497677094001004 - Mean Batch Loss: 0.015450222874060273. 4300 to 74195
+2024-06-26 14:57:18.558 - staging - trainTeacher - INFO - Saving batch 4300 in model
+2024-06-26 14:57:55.761 - staging - trainTeacher - INFO - Mean Loss: 0.016479501548339374 - Mean Batch Loss: 0.015697771329432727. 4400 to 74195
+2024-06-26 14:58:33.264 - staging - trainTeacher - INFO - Mean Loss: 0.016465751999660987 - Mean Batch Loss: 0.01586063436232507. 4500 to 74195
+2024-06-26 14:59:11.284 - staging - trainTeacher - INFO - Mean Loss: 0.016436813482996485 - Mean Batch Loss: 0.015134290847927332. 4600 to 74195
+2024-06-26 14:59:11.719 - staging - trainTeacher - INFO - Saving batch 4600 in model
+2024-06-26 14:59:50.242 - staging - trainTeacher - INFO - Mean Loss: 0.01642973225946516 - Mean Batch Loss: 0.016103925164788962. 4700 to 74195
+2024-06-26 15:00:28.230 - staging - trainTeacher - INFO - Mean Loss: 0.016419221325068456 - Mean Batch Loss: 0.0159251022990793. 4800 to 74195
+2024-06-26 15:01:06.631 - staging - trainTeacher - INFO - Mean Loss: 0.01642271384431121 - Mean Batch Loss: 0.016590389693155884. 4900 to 74195
+2024-06-26 15:01:44.852 - staging - trainTeacher - INFO - Mean Loss: 0.016421029591324673 - Mean Batch Loss: 0.01633848435245454. 5000 to 74195
+2024-06-26 15:02:22.231 - staging - trainTeacher - INFO - Mean Loss: 0.01640684116256369 - Mean Batch Loss: 0.015697277840226887. 5100 to 74195
+2024-06-26 15:02:59.456 - staging - trainTeacher - INFO - Mean Loss: 0.016400292151176204 - Mean Batch Loss: 0.01606622708030045. 5200 to 74195
+2024-06-26 15:03:37.376 - staging - trainTeacher - INFO - Mean Loss: 0.016404308606739585 - Mean Batch Loss: 0.01661320446059108. 5300 to 74195
+2024-06-26 15:04:14.678 - staging - trainTeacher - INFO - Mean Loss: 0.01640559096593555 - Mean Batch Loss: 0.016473568826913833. 5400 to 74195
+2024-06-26 15:04:51.701 - staging - trainTeacher - INFO - Mean Loss: 0.016400461691236837 - Mean Batch Loss: 0.016123429564759137. 5500 to 74195
+2024-06-26 15:05:29.692 - staging - trainTeacher - INFO - Mean Loss: 0.016381142626805345 - Mean Batch Loss: 0.015318400892429054. 5600 to 74195
+2024-06-26 15:06:07.944 - staging - trainTeacher - INFO - Mean Loss: 0.016379698183174494 - Mean Batch Loss: 0.01629879489541054. 5700 to 74195
+2024-06-26 15:06:14.183 - staging - trainTeacher - WARNING - Min Loss: 0.007152773905545473 at 5716
+2024-06-26 15:06:45.316 - staging - trainTeacher - INFO - Mean Loss: 0.016371006304290614 - Mean Batch Loss: 0.015875482289120554. 5800 to 74195
+2024-06-26 15:07:22.870 - staging - trainTeacher - INFO - Mean Loss: 0.01638178753367818 - Mean Batch Loss: 0.017007206650450826. 5900 to 74195
+2024-06-26 15:08:02.121 - staging - trainTeacher - INFO - Mean Loss: 0.01637812040445445 - Mean Batch Loss: 0.01616172310896218. 6000 to 74195
+2024-06-26 15:08:39.830 - staging - trainTeacher - INFO - Mean Loss: 0.016358429636779383 - Mean Batch Loss: 0.015176786668598652. 6100 to 74195
+2024-06-26 15:09:18.893 - staging - trainTeacher - INFO - Mean Loss: 0.016345086501716937 - Mean Batch Loss: 0.015531021831557155. 6200 to 74195
+2024-06-26 15:09:56.933 - staging - trainTeacher - INFO - Mean Loss: 0.016337612729786836 - Mean Batch Loss: 0.015874164132401346. 6300 to 74195
+2024-06-26 15:10:35.298 - staging - trainTeacher - INFO - Mean Loss: 0.016337379185886465 - Mean Batch Loss: 0.01632266358472407. 6400 to 74195
+2024-06-26 15:11:13.625 - staging - trainTeacher - INFO - Mean Loss: 0.016336379180865904 - Mean Batch Loss: 0.016272368859499693. 6500 to 74195
+2024-06-26 15:11:53.084 - staging - trainTeacher - INFO - Mean Loss: 0.016338198558114036 - Mean Batch Loss: 0.016456476273015143. 6600 to 74195
+2024-06-26 15:12:31.603 - staging - trainTeacher - INFO - Mean Loss: 0.016331897139087278 - Mean Batch Loss: 0.015915940469130873. 6700 to 74195
+2024-06-26 15:13:19.603 - staging - trainTeacher - INFO - Mean Loss: 0.01632754003339873 - Mean Batch Loss: 0.016035570381209254. 6800 to 74195
+2024-06-26 15:14:02.366 - staging - trainTeacher - INFO - Mean Loss: 0.016333956594694037 - Mean Batch Loss: 0.01677034692838788. 6900 to 74195
+2024-06-26 15:14:41.638 - staging - trainTeacher - INFO - Mean Loss: 0.016336299565142754 - Mean Batch Loss: 0.01649798795580864. 7000 to 74195
+2024-06-26 15:15:21.947 - staging - trainTeacher - INFO - Mean Loss: 0.01634601441319151 - Mean Batch Loss: 0.01702615092508495. 7100 to 74195
+2024-06-26 15:16:03.508 - staging - trainTeacher - INFO - Mean Loss: 0.016340083137468597 - Mean Batch Loss: 0.015918903248384596. 7200 to 74195
+2024-06-26 15:16:44.793 - staging - trainTeacher - INFO - Mean Loss: 0.016332354402385674 - Mean Batch Loss: 0.015775808189064263. 7300 to 74195
+2024-06-26 15:17:24.841 - staging - trainTeacher - INFO - Mean Loss: 0.016326848287845086 - Mean Batch Loss: 0.01592484686523676. 7400 to 74195
+2024-06-26 15:18:05.316 - staging - trainTeacher - INFO - Mean Loss: 0.016322852695096816 - Mean Batch Loss: 0.01602713887579739. 7500 to 74195
+2024-06-26 15:18:21.146 - staging - trainTeacher - WARNING - Min Loss: 0.006497038062661886 at 7540
+2024-06-26 15:18:44.887 - staging - trainTeacher - INFO - Mean Loss: 0.016313050210220087 - Mean Batch Loss: 0.015577765819616616. 7600 to 74195
+2024-06-26 15:19:25.095 - staging - trainTeacher - INFO - Mean Loss: 0.016309700344895144 - Mean Batch Loss: 0.016055077081546187. 7700 to 74195
+2024-06-26 15:20:05.359 - staging - trainTeacher - INFO - Mean Loss: 0.016320540607806477 - Mean Batch Loss: 0.017155349254608154. 7800 to 74195
+2024-06-26 15:20:46.125 - staging - trainTeacher - INFO - Mean Loss: 0.01631399761737355 - Mean Batch Loss: 0.01580357893370092. 7900 to 74195
+2024-06-26 15:21:30.823 - staging - trainTeacher - INFO - Mean Loss: 0.016308799206650886 - Mean Batch Loss: 0.01589807277545333. 8000 to 74195
+2024-06-26 15:22:12.898 - staging - trainTeacher - INFO - Mean Loss: 0.016305994846680005 - Mean Batch Loss: 0.016081618005409838. 8100 to 74195
+2024-06-26 15:22:54.315 - staging - trainTeacher - INFO - Mean Loss: 0.016305859454921898 - Mean Batch Loss: 0.016294891368597745. 8200 to 74195
+2024-06-26 15:23:34.489 - staging - trainTeacher - INFO - Mean Loss: 0.016295723366884205 - Mean Batch Loss: 0.015464462786912919. 8300 to 74195
+2024-06-26 15:24:15.976 - staging - trainTeacher - INFO - Mean Loss: 0.016302749353668607 - Mean Batch Loss: 0.016885976516641678. 8400 to 74195
+2024-06-26 15:24:57.653 - staging - trainTeacher - INFO - Mean Loss: 0.016304564830827255 - Mean Batch Loss: 0.016457083066925407. 8500 to 74195
+2024-06-26 15:25:38.528 - staging - trainTeacher - INFO - Mean Loss: 0.016298479744420623 - Mean Batch Loss: 0.015781186548992993. 8600 to 74195
+2024-06-26 15:26:20.732 - staging - trainTeacher - INFO - Mean Loss: 0.016293867559100176 - Mean Batch Loss: 0.015897173499688506. 8700 to 74195
+2024-06-26 15:27:02.679 - staging - trainTeacher - INFO - Mean Loss: 0.016289363204368343 - Mean Batch Loss: 0.0158974392991513. 8800 to 74195
+2024-06-26 15:27:55.199 - staging - trainTeacher - INFO - Mean Loss: 0.0162870407153355 - Mean Batch Loss: 0.016082638455554844. 8900 to 74195
+2024-06-26 15:29:19.836 - staging - trainTeacher - INFO - Mean Loss: 0.016282466822756508 - Mean Batch Loss: 0.01587534464430064. 9000 to 74195
+2024-06-26 15:30:13.207 - staging - trainTeacher - INFO - Mean Loss: 0.01627968342934054 - Mean Batch Loss: 0.01602915018796921. 9100 to 74195
+2024-06-26 15:30:51.537 - staging - trainTeacher - INFO - Mean Loss: 0.01627235129585316 - Mean Batch Loss: 0.015605053827166558. 9200 to 74195
+2024-06-26 15:31:31.405 - staging - trainTeacher - INFO - Mean Loss: 0.016266727661230322 - Mean Batch Loss: 0.015749297039583325. 9300 to 74195
+2024-06-26 15:32:08.413 - staging - trainTeacher - INFO - Mean Loss: 0.016254376072316504 - Mean Batch Loss: 0.015105554787442087. 9400 to 74195
+2024-06-26 15:32:09.412 - staging - trainTeacher - INFO - Saving batch 9400 in model
+2024-06-26 15:32:46.526 - staging - trainTeacher - INFO - Mean Loss: 0.016246836931266204 - Mean Batch Loss: 0.015538082281127573. 9500 to 74195
+2024-06-26 15:33:23.883 - staging - trainTeacher - INFO - Mean Loss: 0.016245651525483986 - Mean Batch Loss: 0.016133026122115552. 9600 to 74195
+2024-06-26 15:34:02.491 - staging - trainTeacher - INFO - Mean Loss: 0.016235608958756614 - Mean Batch Loss: 0.015271422127261758. 9700 to 74195
+2024-06-26 15:34:40.046 - staging - trainTeacher - INFO - Mean Loss: 0.01623102132763697 - Mean Batch Loss: 0.015785975232720375. 9800 to 74195
+2024-06-26 15:34:40.986 - staging - trainTeacher - WARNING - Min Loss: 0.005634206347167492 at 9802
+2024-06-26 15:35:17.103 - staging - trainTeacher - INFO - Mean Loss: 0.016228306461560187 - Mean Batch Loss: 0.015962222437374295. 9900 to 74195
+2024-06-26 15:35:56.592 - staging - trainTeacher - INFO - Mean Loss: 0.016231267209401424 - Mean Batch Loss: 0.01652441085316241. 10000 to 74195
+2024-06-26 15:36:35.471 - staging - trainTeacher - INFO - Mean Loss: 0.016228462438766713 - Mean Batch Loss: 0.015947957327589392. 10100 to 74195
+2024-06-26 15:37:13.196 - staging - trainTeacher - INFO - Mean Loss: 0.016232890875374814 - Mean Batch Loss: 0.016680207257159053. 10200 to 74195
+2024-06-26 15:37:54.096 - staging - trainTeacher - INFO - Mean Loss: 0.01623078679330318 - Mean Batch Loss: 0.016016149381175637. 10300 to 74195
+2024-06-26 15:38:32.653 - staging - trainTeacher - INFO - Mean Loss: 0.016228780317095272 - Mean Batch Loss: 0.016022093202918766. 10400 to 74195
+2024-06-26 15:39:11.247 - staging - trainTeacher - INFO - Mean Loss: 0.016222463016839123 - Mean Batch Loss: 0.015565400617197156. 10500 to 74195
+2024-06-26 15:39:49.713 - staging - trainTeacher - INFO - Mean Loss: 0.016218742545421418 - Mean Batch Loss: 0.015828055841848255. 10600 to 74195
+2024-06-26 15:40:28.746 - staging - trainTeacher - INFO - Mean Loss: 0.01622628105811983 - Mean Batch Loss: 0.017025438789278268. 10700 to 74195
+2024-06-26 15:41:07.312 - staging - trainTeacher - INFO - Mean Loss: 0.01622293058225971 - Mean Batch Loss: 0.01586439616046846. 10800 to 74195
+2024-06-26 15:41:46.350 - staging - trainTeacher - INFO - Mean Loss: 0.016219712054006137 - Mean Batch Loss: 0.01587207881733775. 10900 to 74195
+2024-06-26 15:42:25.274 - staging - trainTeacher - INFO - Mean Loss: 0.016216222564614045 - Mean Batch Loss: 0.015835833325982093. 11000 to 74195
+2024-06-26 15:43:04.718 - staging - trainTeacher - INFO - Mean Loss: 0.01620821718603229 - Mean Batch Loss: 0.015327545488253236. 11100 to 74195
+2024-06-26 15:43:43.564 - staging - trainTeacher - INFO - Mean Loss: 0.016200813822141943 - Mean Batch Loss: 0.015378966396674514. 11200 to 74195
+2024-06-26 15:44:21.376 - staging - trainTeacher - INFO - Mean Loss: 0.016192193170512487 - Mean Batch Loss: 0.01522659398149699. 11300 to 74195
+2024-06-26 15:45:00.314 - staging - trainTeacher - INFO - Mean Loss: 0.01618391644704161 - Mean Batch Loss: 0.015248563927598298. 11400 to 74195
+2024-06-26 15:45:39.780 - staging - trainTeacher - INFO - Mean Loss: 0.016182183348163594 - Mean Batch Loss: 0.01598459274508059. 11500 to 74195
+2024-06-26 15:46:18.944 - staging - trainTeacher - INFO - Mean Loss: 0.01617860841701229 - Mean Batch Loss: 0.015767455585300922. 11600 to 74195
+2024-06-26 15:46:58.587 - staging - trainTeacher - INFO - Mean Loss: 0.016168813398689714 - Mean Batch Loss: 0.015032493323087693. 11700 to 74195
+2024-06-26 15:46:59.206 - staging - trainTeacher - INFO - Saving batch 11700 in model
+2024-06-26 15:47:37.932 - staging - trainTeacher - INFO - Mean Loss: 0.016167562394763187 - Mean Batch Loss: 0.01602118242532015. 11800 to 74195
+2024-06-26 15:48:15.868 - staging - trainTeacher - INFO - Mean Loss: 0.016163888791064705 - Mean Batch Loss: 0.015730366818606855. 11900 to 74195
+2024-06-26 15:48:53.366 - staging - trainTeacher - INFO - Mean Loss: 0.016162414865621207 - Mean Batch Loss: 0.01598700299859047. 12000 to 74195
+2024-06-26 15:49:32.962 - staging - trainTeacher - INFO - Mean Loss: 0.016157871756364642 - Mean Batch Loss: 0.015612653214484453. 12100 to 74195
+2024-06-26 15:50:10.960 - staging - trainTeacher - INFO - Mean Loss: 0.016149314901475576 - Mean Batch Loss: 0.015113849891349673. 12200 to 74195
+2024-06-26 15:50:49.974 - staging - trainTeacher - INFO - Mean Loss: 0.016137832940686558 - Mean Batch Loss: 0.014736918904818595. 12300 to 74195
+2024-06-26 15:50:50.492 - staging - trainTeacher - INFO - Saving batch 12300 in model
+2024-06-26 15:51:29.628 - staging - trainTeacher - INFO - Mean Loss: 0.016135348260397274 - Mean Batch Loss: 0.015829707738012077. 12400 to 74195
+2024-06-26 15:52:07.696 - staging - trainTeacher - INFO - Mean Loss: 0.016136245865369738 - Mean Batch Loss: 0.016247557858005166. 12500 to 74195
+2024-06-26 15:52:45.363 - staging - trainTeacher - INFO - Mean Loss: 0.016130785866800224 - Mean Batch Loss: 0.015448231445625425. 12600 to 74195
+2024-06-26 15:53:24.502 - staging - trainTeacher - INFO - Mean Loss: 0.016125810553419696 - Mean Batch Loss: 0.01549887131433934. 12700 to 74195
+2024-06-26 15:54:03.372 - staging - trainTeacher - INFO - Mean Loss: 0.016112189393015616 - Mean Batch Loss: 0.014382165810093283. 12800 to 74195
+2024-06-26 15:54:03.902 - staging - trainTeacher - INFO - Saving batch 12800 in model
+2024-06-26 15:54:42.554 - staging - trainTeacher - INFO - Mean Loss: 0.016115429220629734 - Mean Batch Loss: 0.016530159553512933. 12900 to 74195
+2024-06-26 15:55:21.737 - staging - trainTeacher - INFO - Mean Loss: 0.016117820903951422 - Mean Batch Loss: 0.01642637196928263. 13000 to 74195
+2024-06-26 15:56:00.288 - staging - trainTeacher - INFO - Mean Loss: 0.01611459976145778 - Mean Batch Loss: 0.015695819025859238. 13100 to 74195
+2024-06-26 15:56:39.116 - staging - trainTeacher - INFO - Mean Loss: 0.01610350571127614 - Mean Batch Loss: 0.014650074196979404. 13200 to 74195
+2024-06-26 15:57:18.623 - staging - trainTeacher - INFO - Mean Loss: 0.016091369131675082 - Mean Batch Loss: 0.014489219258539379. 13300 to 74195
+2024-06-26 15:57:57.182 - staging - trainTeacher - INFO - Mean Loss: 0.016092294300945626 - Mean Batch Loss: 0.01621535106562078. 13400 to 74195
+2024-06-26 15:58:35.210 - staging - trainTeacher - INFO - Mean Loss: 0.016084895724480762 - Mean Batch Loss: 0.01509341249242425. 13500 to 74195
+2024-06-26 15:59:13.949 - staging - trainTeacher - INFO - Mean Loss: 0.016076888134347656 - Mean Batch Loss: 0.0149957833904773. 13600 to 74195
+2024-06-26 15:59:51.653 - staging - trainTeacher - INFO - Mean Loss: 0.016074974669312 - Mean Batch Loss: 0.01581472428981215. 13700 to 74195
+2024-06-26 16:00:29.263 - staging - trainTeacher - INFO - Mean Loss: 0.016072111025269873 - Mean Batch Loss: 0.015679763155058025. 13800 to 74195
+2024-06-26 16:01:08.623 - staging - trainTeacher - INFO - Mean Loss: 0.016074428843572425 - Mean Batch Loss: 0.01639431094750762. 13900 to 74195
+2024-06-26 16:01:46.477 - staging - trainTeacher - INFO - Mean Loss: 0.016077729194307243 - Mean Batch Loss: 0.01653651094995439. 14000 to 74195
+2024-06-26 16:02:24.290 - staging - trainTeacher - INFO - Mean Loss: 0.01607573938722915 - Mean Batch Loss: 0.01579714649822563. 14100 to 74195
+2024-06-26 16:03:01.776 - staging - trainTeacher - INFO - Mean Loss: 0.016073415801794746 - Mean Batch Loss: 0.015745767019689084. 14200 to 74195
+2024-06-26 16:03:39.406 - staging - trainTeacher - INFO - Mean Loss: 0.01606693331729971 - Mean Batch Loss: 0.015146355694159865. 14300 to 74195
+2024-06-26 16:04:17.300 - staging - trainTeacher - INFO - Mean Loss: 0.0160652969053738 - Mean Batch Loss: 0.015831273635849356. 14400 to 74195
+2024-06-26 16:04:54.742 - staging - trainTeacher - INFO - Mean Loss: 0.016063676315031774 - Mean Batch Loss: 0.01583029509987682. 14500 to 74195
+2024-06-26 16:05:32.195 - staging - trainTeacher - INFO - Mean Loss: 0.016057419422259987 - Mean Batch Loss: 0.015150107401423156. 14600 to 74195
+2024-06-26 16:06:10.049 - staging - trainTeacher - INFO - Mean Loss: 0.01605134405338633 - Mean Batch Loss: 0.015164279444143176. 14700 to 74195
+2024-06-26 16:06:48.568 - staging - trainTeacher - INFO - Mean Loss: 0.016048021143950805 - Mean Batch Loss: 0.015559520227834583. 14800 to 74195
+2024-06-26 16:07:27.642 - staging - trainTeacher - INFO - Mean Loss: 0.016039548572612857 - Mean Batch Loss: 0.014785523288883268. 14900 to 74195
+2024-06-26 16:08:06.969 - staging - trainTeacher - INFO - Mean Loss: 0.016042123416602726 - Mean Batch Loss: 0.016425800919532777. 15000 to 74195
+2024-06-26 16:08:44.871 - staging - trainTeacher - INFO - Mean Loss: 0.016035700499474642 - Mean Batch Loss: 0.01507219870109111. 15100 to 74195
+2024-06-26 16:09:23.836 - staging - trainTeacher - INFO - Mean Loss: 0.016029260386572854 - Mean Batch Loss: 0.015056738937273622. 15200 to 74195
+2024-06-26 16:10:02.724 - staging - trainTeacher - INFO - Mean Loss: 0.016024854105703874 - Mean Batch Loss: 0.01535505535081029. 15300 to 74195
+2024-06-26 16:10:41.050 - staging - trainTeacher - INFO - Mean Loss: 0.016023694695380564 - Mean Batch Loss: 0.015846293321810662. 15400 to 74195
+2024-06-26 16:11:19.741 - staging - trainTeacher - INFO - Mean Loss: 0.016013735807867576 - Mean Batch Loss: 0.014479967541992664. 15500 to 74195
+2024-06-26 16:11:58.023 - staging - trainTeacher - INFO - Mean Loss: 0.016010595025189884 - Mean Batch Loss: 0.015523742302320898. 15600 to 74195
+2024-06-26 16:12:35.668 - staging - trainTeacher - INFO - Mean Loss: 0.016007115542832885 - Mean Batch Loss: 0.015464281500317156. 15700 to 74195
+2024-06-26 16:13:13.504 - staging - trainTeacher - INFO - Mean Loss: 0.01600527781376041 - Mean Batch Loss: 0.015716735972091556. 15800 to 74195
+2024-06-26 16:13:51.603 - staging - trainTeacher - INFO - Mean Loss: 0.016006881482950732 - Mean Batch Loss: 0.016260277251712977. 15900 to 74195
+2024-06-26 16:13:56.313 - staging - trainTeacher - WARNING - Min Loss: 0.005374691914767027 at 15912
+2024-06-26 16:14:29.549 - staging - trainTeacher - INFO - Mean Loss: 0.016004680485591692 - Mean Batch Loss: 0.01565469989553094. 16000 to 74195
+2024-06-26 16:15:07.348 - staging - trainTeacher - INFO - Mean Loss: 0.01600345866058227 - Mean Batch Loss: 0.01580795444082469. 16100 to 74195
+2024-06-26 16:15:44.604 - staging - trainTeacher - INFO - Mean Loss: 0.01599569325649482 - Mean Batch Loss: 0.014745385544374585. 16200 to 74195
+2024-06-26 16:16:23.122 - staging - trainTeacher - INFO - Mean Loss: 0.01599190910337379 - Mean Batch Loss: 0.015378838456235826. 16300 to 74195
+2024-06-26 16:17:01.719 - staging - trainTeacher - INFO - Mean Loss: 0.015981093997861576 - Mean Batch Loss: 0.014218123648315668. 16400 to 74195
+2024-06-26 16:17:02.293 - staging - trainTeacher - INFO - Saving batch 16400 in model
+2024-06-26 16:17:39.914 - staging - trainTeacher - INFO - Mean Loss: 0.015980569864468885 - Mean Batch Loss: 0.015894606746733188. 16500 to 74195
+2024-06-26 16:18:17.589 - staging - trainTeacher - INFO - Mean Loss: 0.01597435366807546 - Mean Batch Loss: 0.014948619101196527. 16600 to 74195
+2024-06-26 16:18:55.724 - staging - trainTeacher - INFO - Mean Loss: 0.015967472492140658 - Mean Batch Loss: 0.01482512847520411. 16700 to 74195
+2024-06-26 16:19:33.739 - staging - trainTeacher - INFO - Mean Loss: 0.015968334177311277 - Mean Batch Loss: 0.016112244217656554. 16800 to 74195
+2024-06-26 16:20:12.149 - staging - trainTeacher - INFO - Mean Loss: 0.015965912727784887 - Mean Batch Loss: 0.015559084992855788. 16900 to 74195
+2024-06-26 16:21:03.816 - staging - trainTeacher - INFO - Mean Loss: 0.01595957167873353 - Mean Batch Loss: 0.014887870978564024. 17000 to 74195
+2024-06-26 16:21:44.622 - staging - trainTeacher - INFO - Mean Loss: 0.015952094396204104 - Mean Batch Loss: 0.014680881593376398. 17100 to 74195
+2024-06-26 16:22:23.126 - staging - trainTeacher - INFO - Mean Loss: 0.015950561964581306 - Mean Batch Loss: 0.015688500832766294. 17200 to 74195
+2024-06-26 16:23:02.253 - staging - trainTeacher - INFO - Mean Loss: 0.015944565233873692 - Mean Batch Loss: 0.014913067584857345. 17300 to 74195
+2024-06-26 16:23:40.342 - staging - trainTeacher - INFO - Mean Loss: 0.015936519552564282 - Mean Batch Loss: 0.014544536229223012. 17400 to 74195
+2024-06-26 16:24:18.764 - staging - trainTeacher - INFO - Mean Loss: 0.015929234920162277 - Mean Batch Loss: 0.014661636035889387. 17500 to 74195
+2024-06-26 16:24:23.085 - staging - trainTeacher - WARNING - Min Loss: 0.0046299840323626995 at 17511
+2024-06-26 16:24:56.916 - staging - trainTeacher - INFO - Mean Loss: 0.015925983607399257 - Mean Batch Loss: 0.015356971360743045. 17600 to 74195
+2024-06-26 16:25:35.064 - staging - trainTeacher - INFO - Mean Loss: 0.015922434346234866 - Mean Batch Loss: 0.015297728888690472. 17700 to 74195
+2024-06-26 16:25:55.922 - staging - trainTeacher - WARNING - Min Loss: 0.0028884599450975657 at 17753
+2024-06-26 16:26:13.635 - staging - trainTeacher - INFO - Mean Loss: 0.015922661967912796 - Mean Batch Loss: 0.015962953281123193. 17800 to 74195
+2024-06-26 16:26:52.243 - staging - trainTeacher - INFO - Mean Loss: 0.015920488544023954 - Mean Batch Loss: 0.015533597357571125. 17900 to 74195
+2024-06-26 16:27:30.166 - staging - trainTeacher - INFO - Mean Loss: 0.01591490876625926 - Mean Batch Loss: 0.014916072748601437. 18000 to 74195
+2024-06-26 16:28:08.042 - staging - trainTeacher - INFO - Mean Loss: 0.015913889442615424 - Mean Batch Loss: 0.015730400993488727. 18100 to 74195
+2024-06-26 16:28:45.869 - staging - trainTeacher - INFO - Mean Loss: 0.01591015520529554 - Mean Batch Loss: 0.015234220908023417. 18200 to 74195
+2024-06-26 16:29:25.045 - staging - trainTeacher - INFO - Mean Loss: 0.01590665421061076 - Mean Batch Loss: 0.015269438168033958. 18300 to 74195
+2024-06-26 16:30:04.259 - staging - trainTeacher - INFO - Mean Loss: 0.015897854984881724 - Mean Batch Loss: 0.014287508684210479. 18400 to 74195
+2024-06-26 16:30:44.505 - staging - trainTeacher - INFO - Mean Loss: 0.015893416895823236 - Mean Batch Loss: 0.015076764128170907. 18500 to 74195
+2024-06-26 16:31:23.121 - staging - trainTeacher - INFO - Mean Loss: 0.015895485627586067 - Mean Batch Loss: 0.016278221691027283. 18600 to 74195
+2024-06-26 16:32:02.070 - staging - trainTeacher - INFO - Mean Loss: 0.01589201917282143 - Mean Batch Loss: 0.01524722392205149. 18700 to 74195
+2024-06-26 16:32:40.065 - staging - trainTeacher - INFO - Mean Loss: 0.015889846723504228 - Mean Batch Loss: 0.015483576976694167. 18800 to 74195
+2024-06-26 16:33:19.544 - staging - trainTeacher - INFO - Mean Loss: 0.015884619264468602 - Mean Batch Loss: 0.014901804691180586. 18900 to 74195
+2024-06-26 16:33:58.105 - staging - trainTeacher - INFO - Mean Loss: 0.015883762073119298 - Mean Batch Loss: 0.01572174433618784. 19000 to 74195
+2024-06-26 16:34:38.043 - staging - trainTeacher - INFO - Mean Loss: 0.015881208498468257 - Mean Batch Loss: 0.015396003779023885. 19100 to 74195
+2024-06-26 16:35:15.984 - staging - trainTeacher - INFO - Mean Loss: 0.015872210782263512 - Mean Batch Loss: 0.014153557009994983. 19200 to 74195
+2024-06-26 16:35:16.957 - staging - trainTeacher - INFO - Saving batch 19200 in model
+2024-06-26 16:35:56.142 - staging - trainTeacher - INFO - Mean Loss: 0.015865430628409335 - Mean Batch Loss: 0.014563573286868631. 19300 to 74195
+2024-06-26 16:36:35.191 - staging - trainTeacher - INFO - Mean Loss: 0.01585939700690666 - Mean Batch Loss: 0.014694847720675171. 19400 to 74195
+2024-06-26 16:37:15.270 - staging - trainTeacher - INFO - Mean Loss: 0.015851577845408797 - Mean Batch Loss: 0.014334582323208452. 19500 to 74195
+2024-06-26 16:37:54.847 - staging - trainTeacher - INFO - Mean Loss: 0.015849283409640983 - Mean Batch Loss: 0.015401845490559936. 19600 to 74195
+2024-06-26 16:38:33.412 - staging - trainTeacher - INFO - Mean Loss: 0.015848008444388852 - Mean Batch Loss: 0.01559810250531882. 19700 to 74195
+2024-06-26 16:39:13.508 - staging - trainTeacher - INFO - Mean Loss: 0.01584406380930971 - Mean Batch Loss: 0.015066931252367794. 19800 to 74195
+2024-06-26 16:39:52.901 - staging - trainTeacher - INFO - Mean Loss: 0.01584389107597827 - Mean Batch Loss: 0.015809688149020076. 19900 to 74195
+2024-06-26 16:40:36.084 - staging - trainTeacher - INFO - Mean Loss: 0.01584189155419436 - Mean Batch Loss: 0.01544396672397852. 20000 to 74195
+2024-06-26 16:41:16.487 - staging - trainTeacher - INFO - Mean Loss: 0.01583517309707332 - Mean Batch Loss: 0.01449141448829323. 20100 to 74195
+2024-06-26 16:41:55.134 - staging - trainTeacher - INFO - Mean Loss: 0.015830246747348436 - Mean Batch Loss: 0.014840001189149916. 20200 to 74195
+2024-06-26 16:42:33.803 - staging - trainTeacher - INFO - Mean Loss: 0.015827304225453618 - Mean Batch Loss: 0.01523288537748158. 20300 to 74195
+2024-06-26 16:43:12.845 - staging - trainTeacher - INFO - Mean Loss: 0.01582328306261928 - Mean Batch Loss: 0.015006946795620025. 20400 to 74195
+2024-06-26 16:43:51.946 - staging - trainTeacher - INFO - Mean Loss: 0.015813116311204637 - Mean Batch Loss: 0.013738997355103493. 20500 to 74195
+2024-06-26 16:43:52.435 - staging - trainTeacher - INFO - Saving batch 20500 in model
+2024-06-26 16:44:30.787 - staging - trainTeacher - INFO - Mean Loss: 0.015812152098914678 - Mean Batch Loss: 0.015614478937350214. 20600 to 74195
+2024-06-26 16:45:09.553 - staging - trainTeacher - INFO - Mean Loss: 0.015804471304379415 - Mean Batch Loss: 0.014222150822170078. 20700 to 74195
+2024-06-26 16:45:48.443 - staging - trainTeacher - INFO - Mean Loss: 0.015800342126305083 - Mean Batch Loss: 0.014945560973137617. 20800 to 74195
+2024-06-26 16:46:28.978 - staging - trainTeacher - INFO - Mean Loss: 0.015794933793617513 - Mean Batch Loss: 0.014669946511276066. 20900 to 74195
+2024-06-26 16:47:07.649 - staging - trainTeacher - INFO - Mean Loss: 0.015793148398300993 - Mean Batch Loss: 0.015419982923194766. 21000 to 74195
+2024-06-26 16:47:46.138 - staging - trainTeacher - INFO - Mean Loss: 0.015785009996467845 - Mean Batch Loss: 0.014075864227488638. 21100 to 74195
+2024-06-26 16:48:24.527 - staging - trainTeacher - INFO - Mean Loss: 0.01578187842235385 - Mean Batch Loss: 0.015121084968559444. 21200 to 74195
+2024-06-26 16:49:02.565 - staging - trainTeacher - INFO - Mean Loss: 0.01577824276481017 - Mean Batch Loss: 0.01500744700897485. 21300 to 74195
+2024-06-26 16:49:40.927 - staging - trainTeacher - INFO - Mean Loss: 0.015769854998733023 - Mean Batch Loss: 0.013983176946640015. 21400 to 74195
+2024-06-26 16:50:20.973 - staging - trainTeacher - INFO - Mean Loss: 0.01576621952529214 - Mean Batch Loss: 0.014988191854208709. 21500 to 74195
+2024-06-26 16:50:59.876 - staging - trainTeacher - INFO - Mean Loss: 0.015762501413279926 - Mean Batch Loss: 0.01496307014953345. 21600 to 74195
+2024-06-26 16:51:38.231 - staging - trainTeacher - INFO - Mean Loss: 0.01575559392355109 - Mean Batch Loss: 0.014263507067225874. 21700 to 74195
+2024-06-26 16:52:18.273 - staging - trainTeacher - INFO - Mean Loss: 0.01574927937328222 - Mean Batch Loss: 0.014378958819434047. 21800 to 74195
+2024-06-26 16:52:55.559 - staging - trainTeacher - INFO - Mean Loss: 0.015748773721656076 - Mean Batch Loss: 0.015638536610640585. 21900 to 74195
+2024-06-26 16:53:33.597 - staging - trainTeacher - INFO - Mean Loss: 0.01574455012445767 - Mean Batch Loss: 0.014819540102034807. 22000 to 74195
+2024-06-26 16:54:11.831 - staging - trainTeacher - INFO - Mean Loss: 0.01574012742681727 - Mean Batch Loss: 0.014767089718952775. 22100 to 74195
+2024-06-26 16:54:49.918 - staging - trainTeacher - INFO - Mean Loss: 0.015736244794357267 - Mean Batch Loss: 0.014878144194371999. 22200 to 74195
+2024-06-26 16:55:27.520 - staging - trainTeacher - INFO - Mean Loss: 0.015731830545150878 - Mean Batch Loss: 0.014751823078840971. 22300 to 74195
+2024-06-26 16:56:05.980 - staging - trainTeacher - INFO - Mean Loss: 0.015727789995802384 - Mean Batch Loss: 0.014826707085594535. 22400 to 74195
+2024-06-26 16:56:45.677 - staging - trainTeacher - INFO - Mean Loss: 0.015726548390297267 - Mean Batch Loss: 0.015448416341096163. 22500 to 74195
+2024-06-26 16:57:25.561 - staging - trainTeacher - INFO - Mean Loss: 0.015724419422684953 - Mean Batch Loss: 0.01524538042023778. 22600 to 74195
+2024-06-26 16:58:03.608 - staging - trainTeacher - INFO - Mean Loss: 0.015721747406639928 - Mean Batch Loss: 0.015117845060303807. 22700 to 74195
+2024-06-26 16:58:41.821 - staging - trainTeacher - INFO - Mean Loss: 0.01571746111744856 - Mean Batch Loss: 0.01474443060811609. 22800 to 74195
+2024-06-26 16:59:19.785 - staging - trainTeacher - INFO - Mean Loss: 0.01571092872725782 - Mean Batch Loss: 0.014221478439867496. 22900 to 74195
+2024-06-26 16:59:57.900 - staging - trainTeacher - INFO - Mean Loss: 0.01570694649642129 - Mean Batch Loss: 0.014794975812546908. 23000 to 74195
+2024-06-26 17:00:36.430 - staging - trainTeacher - INFO - Mean Loss: 0.015699686488384348 - Mean Batch Loss: 0.01402981203980744. 23100 to 74195
+2024-06-26 17:01:15.168 - staging - trainTeacher - INFO - Mean Loss: 0.015699560899544128 - Mean Batch Loss: 0.015670548621565104. 23200 to 74195
+2024-06-26 17:01:53.034 - staging - trainTeacher - INFO - Mean Loss: 0.01569462129254471 - Mean Batch Loss: 0.0145485830726102. 23300 to 74195
+2024-06-26 17:02:31.425 - staging - trainTeacher - INFO - Mean Loss: 0.015696708499865278 - Mean Batch Loss: 0.01618304867763072. 23400 to 74195
+2024-06-26 17:03:09.891 - staging - trainTeacher - INFO - Mean Loss: 0.01569000418284235 - Mean Batch Loss: 0.014121126956306398. 23500 to 74195
+2024-06-26 17:03:47.650 - staging - trainTeacher - INFO - Mean Loss: 0.01568383222497658 - Mean Batch Loss: 0.014233360406942666. 23600 to 74195
+2024-06-26 17:04:25.518 - staging - trainTeacher - INFO - Mean Loss: 0.015678243284055118 - Mean Batch Loss: 0.014359197337180376. 23700 to 74195
+2024-06-26 17:05:04.293 - staging - trainTeacher - INFO - Mean Loss: 0.015673453536403554 - Mean Batch Loss: 0.014538235445506871. 23800 to 74195
+2024-06-26 17:05:42.920 - staging - trainTeacher - INFO - Mean Loss: 0.015668198841668656 - Mean Batch Loss: 0.014417528947815299. 23900 to 74195
+2024-06-26 17:06:21.583 - staging - trainTeacher - INFO - Mean Loss: 0.015662934761692685 - Mean Batch Loss: 0.014404767006635667. 24000 to 74195
+2024-06-26 17:06:59.605 - staging - trainTeacher - INFO - Mean Loss: 0.015661045835458888 - Mean Batch Loss: 0.015207684650085866. 24100 to 74195
+2024-06-26 17:07:38.910 - staging - trainTeacher - INFO - Mean Loss: 0.015659242986517597 - Mean Batch Loss: 0.015224738363176584. 24200 to 74195
+2024-06-26 17:08:18.282 - staging - trainTeacher - INFO - Mean Loss: 0.015657937791327493 - Mean Batch Loss: 0.015342067503370345. 24300 to 74195
+2024-06-26 17:08:58.825 - staging - trainTeacher - INFO - Mean Loss: 0.01565464869485887 - Mean Batch Loss: 0.014855365362018346. 24400 to 74195
+2024-06-26 17:09:41.688 - staging - trainTeacher - INFO - Mean Loss: 0.015648654966156073 - Mean Batch Loss: 0.014186125225387513. 24500 to 74195
+2024-06-26 17:10:19.782 - staging - trainTeacher - INFO - Mean Loss: 0.015641657068858214 - Mean Batch Loss: 0.013927102251909674. 24600 to 74195
+2024-06-26 17:11:25.591 - staging - trainTeacher - INFO - Mean Loss: 0.015636400673363877 - Mean Batch Loss: 0.014343274817802011. 24700 to 74195
+2024-06-26 17:12:04.748 - staging - trainTeacher - INFO - Mean Loss: 0.01563179884720081 - Mean Batch Loss: 0.01449510176666081. 24800 to 74195
+2024-06-26 17:12:43.045 - staging - trainTeacher - INFO - Mean Loss: 0.01563249676621712 - Mean Batch Loss: 0.01580558766145259. 24900 to 74195
+2024-06-26 17:13:21.320 - staging - trainTeacher - INFO - Mean Loss: 0.015625703716991082 - Mean Batch Loss: 0.013934166529215872. 25000 to 74195
+2024-06-26 17:13:59.096 - staging - trainTeacher - INFO - Mean Loss: 0.015620897628809883 - Mean Batch Loss: 0.01441932752262801. 25100 to 74195
+2024-06-26 17:14:36.380 - staging - trainTeacher - INFO - Mean Loss: 0.015612940727891801 - Mean Batch Loss: 0.013615679028443992. 25200 to 74195
+2024-06-26 17:14:36.923 - staging - trainTeacher - INFO - Saving batch 25200 in model
+2024-06-26 17:15:14.434 - staging - trainTeacher - INFO - Mean Loss: 0.01560722279014087 - Mean Batch Loss: 0.014166245297528803. 25300 to 74195
+2024-06-26 17:15:52.670 - staging - trainTeacher - INFO - Mean Loss: 0.015603651918096073 - Mean Batch Loss: 0.01470018558204174. 25400 to 74195
+2024-06-26 18:56:16.190 - staging - trainTeacher - WARNING - EPOCH: 1
+2024-06-27 11:48:21.724 - staging - arguments_parser - CRITICAL - Value for build must be > 0 & < 4097 not -1
+2024-06-27 11:50:13.247 - staging - arguments_parser - CRITICAL - 'batch'
+2024-06-27 11:50:51.429 - staging - arguments_parser - CRITICAL - Value for build must be > 0 & < 74195 not 100000000000
+2024-06-27 11:54:10.844 - staging - arguments_parser - CRITICAL - Value for build must be > 0 & < 74195 not 100000000000
+2024-06-27 11:54:26.632 - staging - arguments_parser - CRITICAL - Exception: ('Value for build must be > 0 & < 74195 not 100000000000',)
+2024-06-27 11:55:05.191 - staging - arguments_parser - CRITICAL - Exception: Value for build must be > 0 & < 74195 not 100000000000
+2024-06-27 11:55:57.299 - staging - arguments_parser - CRITICAL - Exception: Value for build must be > 0 & < 74195 not 100000000000
+2024-06-27 11:56:25.192 - staging - arguments_parser - CRITICAL - Exception: Value for build must be > 0 & < 74195 not 100000000000
+2024-06-27 11:57:31.833 - staging - arguments_parser - CRITICAL - ValueError: Value for build must be > 0 & < 74195 not 100000000000
+2024-06-27 11:58:33.301 - staging - arguments_parser - CRITICAL - KeyError: batch
+2024-06-27 12:00:41.570 - staging - arguments_parser - CRITICAL - KeyError: batch
+Traceback (most recent call last):
+  File "/home/fede/Desktop/Tirocinio/run.py", line 27, in arguments_parser
+    saliency.trainTeacher(conf,verbose=args.verbose)
+  File "/home/fede/Desktop/Tirocinio/saliencyDetection/saliency.py", line 164, in trainTeacher
+    batch_size = int(config["batch"])
+KeyError: 'batch'
+
+2024-06-27 12:02:07.900 - staging - arguments_parser - CRITICAL - KeyError: batch in run.py
+2024-06-27 12:02:45.752 - staging - arguments_parser - CRITICAL - KeyError: batch in run.py: 27
+2024-06-27 12:26:34.159 - staging - arguments_parser - CRITICAL - KeyError: batch
+2024-06-27 12:41:47.373 - staging - arguments_parser - CRITICAL - KeyError: learning_rate
+2024-06-27 12:42:04.577 - staging - trainTeacher - WARNING - EPOCH: 1
+2024-06-27 12:42:19.440 - staging - arguments_parser - CRITICAL - RuntimeError: CUDA error: no kernel image is available for execution on the device
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+2024-06-27 12:43:57.203 - staging - trainTeacher - WARNING - EPOCH: 1
+2024-06-27 12:43:58.170 - staging - arguments_parser - CRITICAL - RuntimeError: CUDA error: no kernel image is available for execution on the device
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+2024-06-27 17:02:50.800 - staging - trainTeacher - WARNING - EPOCH: 1
+2024-06-27 17:02:53.403 - staging - trainTeacher - INFO - Min Loss: 0.022190473973751068 at 0
+2024-06-27 17:02:53.983 - staging - trainTeacher - INFO - Min Loss: 0.01951907016336918 at 1
+2024-06-27 17:02:56.386 - staging - trainTeacher - INFO - Min Loss: 0.018923496827483177 at 5
+2024-06-27 17:02:57.704 - staging - trainTeacher - INFO - Min Loss: 0.013657260686159134 at 7
+2024-06-27 17:03:05.778 - staging - trainTeacher - INFO - Min Loss: 0.013228213414549828 at 21
+2024-06-27 17:03:07.374 - staging - trainTeacher - INFO - Min Loss: 0.012262564152479172 at 24
+2024-06-27 17:05:46.440 - staging - trainTeacher - WARNING - EPOCH: 1
+2024-06-27 17:05:47.019 - staging - trainTeacher - INFO - Min Loss: 0.016719050705432892 at 0
+2024-06-27 17:05:48.606 - staging - trainTeacher - INFO - Min Loss: 0.011362772434949875 at 3
+2024-06-27 17:05:56.784 - staging - trainTeacher - INFO - Min Loss: 0.009381134994328022 at 17
+2024-06-27 17:06:20.444 - staging - trainTeacher - INFO - Min Loss: 0.008894536644220352 at 61
+2024-06-27 17:06:44.824 - staging - trainTeacher - INFO - Mean Loss: 0.01786568617024044 - Mean Batch Loss: 0.01786568617024044. 100 to 74195
+2024-06-27 17:06:48.084 - staging - trainTeacher - INFO - Saving batch 100 in model
+2024-06-27 17:07:44.841 - staging - trainTeacher - INFO - Mean Loss: 0.01785315081143557 - Mean Batch Loss: 0.017840490099042653. 200 to 74195
+2024-06-27 17:07:45.370 - staging - trainTeacher - INFO - Saving batch 200 in model

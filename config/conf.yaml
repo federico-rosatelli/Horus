@@ -2,9 +2,13 @@ version: 0.01a
 
 
 saliencyDetection:
-      training:
-            learningRate: 0.0001
-            epochs: 120
+      teacher:
+            training:
+                  file: trainTeacher.json
+                  learning_rate: 0.0001
+                  epochs: 120
+                  batch_size: 100
+
 
 
 evaluation:

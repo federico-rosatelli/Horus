@@ -1,15 +1,12 @@
 from matplotlib import pyplot as plt
 from saliencyDetection.dataLoader import dataLoader as dtL
 from . import *
+import json
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-import torchvision
-from torchvision import transforms
-import segmentation_models_pytorch as smp
 import numpy as np
-import cv2
 
 import logging
 
@@ -32,7 +29,7 @@ class HorusModelTeacher(nn.Module):
         super(HorusModelTeacher,self).__init__()
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(1280, 256, kernel_size=3, padding=1),
+            nn.Conv2d(720, 256, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=1, stride=2),
             nn.Conv2d(256, 512, kernel_size=3, padding=1),
@@ -44,17 +41,19 @@ class HorusModelTeacher(nn.Module):
         
         # Decoder
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2),
+            nn.ConvTranspose2d(1024, 512, kernel_size=1, stride=2),
             nn.ReLU(),
-            nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),
+            nn.ConvTranspose2d(512, 256, kernel_size=1, stride=2),
             nn.ReLU(),
-            nn.Conv2d(256, 1280, kernel_size=3, padding=1),
+            nn.Conv2d(256, 720, kernel_size=3, padding=1),
             nn.ReLU()
         )
         
     def forward(self, x):
         x = self.encoder(x)
         x = self.decoder(x)
+        padding = (0, 3)
+        x = F.pad(x, padding, mode='constant', value=0)
         return x
 
 
@@ -148,37 +147,79 @@ class Horus:
         return pred.detach().cpu().numpy()
 
 
-def trainTeacher(epoch:int=10,verbose:str|None=None):
+def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_model.pt"):
+    if os.path.isfile(f"{DIR}/{model_name}"):
+        os.remove(f"{DIR}/{model_name}")
     if verbose:
         logger = logging.getLogger(verbose)
+    config = conf["saliencyDetection"]["teacher"]["training"]
+    epochs = int(config["epochs"])
+    if epochs < 0 or epochs > 4096:
+        raise ValueError(f"Value for build must be > 0 & < 4097 not {epochs}")
     
+    batch_size = int(config["batch_size"])
+    if batch_size < 0 or batch_size > len(trainT):
+        raise ValueError(f"Value for build must be > 0 & < {len(trainT)} not {batch_size}")
+
     model = HorusModelTeacher()
     device = torch.device("cpu")
     model = model.to(device)
 
-    learning_rate = 0.0001
+    learning_rate = float(config["learning_rate"])
     loss_fn = nn.MSELoss()
 
     optimizer = torch.optim.Adam(model.parameters(),learning_rate)
 
     model.train()
-    for k in range(epoch):
-        for img,label in trainT:
+    optimizer.zero_grad()
+
+    history = []
+    mean_history = []
+    min_mean_batch_loss = 1
+    min_loss = 1
+    for k in range(epochs):
+        batch_history = []
+        logger.warn(f"EPOCH: {k+1}")
+        for batch,(img,label) in enumerate(trainT):
             x = img.to(device)
             y = label.to(device)
 
             predict = model(x)
-            print(predict.size(),y.size())
             loss = loss_fn(predict,y)
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             loss = loss.item()
             #logger.info(loss)
-            if loss>0.02:
+            history.append(loss)
+            batch_history.append((predict,y,loss))
+            if batch % batch_size == 0 and batch != 0:
+                mean_loss = sum(history)/len(history)
+                mean_loss_batch = sum([z[2] for z in batch_history])/len(batch_history)
+                
+                if verbose:
+                    logger.info(f"Mean Loss: {mean_loss} - Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
+                
+                mean_history.append(mean_loss)
+                min_batch_loss = min(batch_history,key=lambda z:z[2])
+                
+                show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2])
+                batch_history = []
+                if min_mean_batch_loss > mean_loss_batch:
+                    min_mean_batch_loss = mean_loss_batch
+                    torch.save(model.state_dict(), f"{DIR}/{model_name}")
                     if verbose:
-                        logger.info(f"Loss: {loss}")
-                    show(predict,y)
+                        logger.info(f"Saving batch {batch} in model")
+                    
+
+            if loss<min_loss:
+                min_loss = loss
+                logger.info(f"Min Loss: {min_loss} at {batch}")
+    json_dict = {
+        "history":history,
+        "mean_history":mean_history
+    }
+    with open(f"{DIR}/{config['file']}","w") as out:
+        json.dump(json_dict,out,indent=4)
 
 
 def trainHorus(epoch:int=10,verbose:str|None=None):
@@ -264,13 +305,13 @@ def trainHorus(epoch:int=10,verbose:str|None=None):
 
 
 
-def show(img,label)->None:
+def show(img,label,min_loss)->None:
     
     # # print(img)
     # #image = (255.0 * img).to(torch.uint8)
     # print(type(img))
     #print(img.size(),label.size())
-    image = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
+    #image = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
     # # print(image.shape)
     # image = image[:, :, :, ::-1]
     # print(image.shape)
@@ -280,15 +321,15 @@ def show(img,label)->None:
     #np.save("testss/img/test.png", img.detach().cpu().numpy())
     fig, axarr = plt.subplots(1,2)
     
-    grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
-    grayscale_tensor = grayscale_transform(torch.from_numpy(np.array(image)).float())
+    # grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
+    # grayscale_tensor = grayscale_transform(torch.from_numpy(np.array(image)).float())
     #grayscale_tensor = torch.from_numpy(np.array(image)).float().squeeze(0)
     
-    axarr[0].imshow(grayscale_tensor.detach().numpy().reshape(720,1280,1))
+    axarr[0].imshow((img*255).detach().numpy().reshape(720,1280,1))
     axarr[0].set_title('Image')
     axarr[0].axis('off')
 
-    axarr[1].imshow((label*255).detach().numpy().reshape(256,256,1))
+    axarr[1].imshow((label*255).detach().numpy().reshape(720,1280,1))
     axarr[1].set_title('Label')
     axarr[1].axis('off')
 
@@ -298,6 +339,7 @@ def show(img,label)->None:
 
     #fig.suptitle(f'Image & Label of {self.type}/{self.item} on Frame:{self.nframe}', fontsize=10)
     plt.tight_layout()
+    plt.title(f"Min Loss: {min_loss}")
     plt.savefig(f"testss/img/test.png")
     plt.close(fig)
 

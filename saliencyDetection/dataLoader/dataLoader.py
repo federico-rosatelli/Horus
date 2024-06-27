@@ -30,8 +30,8 @@ class AVS1KDataSetTeacher:
         imgFrame = Image.open(videoPath)
         imgGround = Image.open(groundPath)
 
-        imgFrame = imgFrame.resize((1280,720))
-        imgGround = imgGround.resize((1280,720))
+        imgFrame = imgFrame.resize((720,1280))
+        imgGround = imgGround.resize((720,1280))
 
         imgFrame = pil_to_tensor(imgFrame)
         imgGround = pil_to_tensor(imgGround)

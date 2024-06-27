@@ -45,6 +45,14 @@ La forma viene presa tramite [rembg](https://github.com/danielgatis/rembg), un p
 
 Una volta presi in considerazione questi parametri, ognuno con il proprio bias, il programma andrà a scegliere il moglior prossimo candidato. (#TODO la funzione di scelta ancora non è perfetta va implementata meglio)
 
+# USAGE
+
+```python
+python3 run.py -b --verbose developer
+```
+
+Per creare la Rete Neurale con output da terminale
+
 
 
 
