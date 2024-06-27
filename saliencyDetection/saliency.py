@@ -179,7 +179,7 @@ def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_m
     min_loss = 1
     for k in range(epochs):
         batch_history = []
-        logger.warn(f"EPOCH: {k+1}")
+        logger.info(f"EPOCH: {k+1}")
         for batch,(img,label) in enumerate(trainT):
             x = img.to(device)
             y = label.to(device)

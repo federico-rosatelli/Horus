@@ -5,7 +5,7 @@
 
 
 from saliencyDetection import saliency
-
+import time
 # saliency.trainHorus(12)
 
 
@@ -21,15 +21,32 @@ def arguments_parser(args:argparse.Namespace):
     conf = getConfigYAML(args.config)
     
     logger = getLogger(args.verbose if args.verbose else "staging")
+
+    main(args,conf,logger)
+
+    
+
+def main(args:argparse.Namespace,conf:any,logger:logging.Logger) -> None:
+    start_time = time.time()
     try:
         if args.build:
             saliency.trainTeacher(conf,verbose=args.verbose)
-            return
+
+        elif args.test:
+            tests.unitTestCollider()
+        logger.info(f"Total Time: %.2f s" % (time.time()-start_time))
+
     except Exception as e:
-        logger.fatal(f"{e.__class__.__name__}: {' | '.join(e.args)}")
-    if args.test:
-        tests.unitTestCollider()
+        logger.fatal(f"{e.__class__.__name__}: {' | '.join(e.args)} - Total Time: %.2f s" % (time.time()-start_time))
         return
+    
+    except KeyboardInterrupt:
+        logger.fatal(f"Interrupt by User - Total Time: %.2f s" % (time.time()-start_time))
+        return
+    
+    
+    
+
 
 def getConfigYAML(conf_file:str) -> any:
     with open(conf_file, 'rt') as f:
