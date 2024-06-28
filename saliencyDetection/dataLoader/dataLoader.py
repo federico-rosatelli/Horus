@@ -48,108 +48,81 @@ class AVS1KDataSetTeacher:
 class AVS1KDataSet:
 
     def __init__(self,rootDir,subDir) -> None:
-        self.video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
-        self.video_Ground_List = sorted(glob(f"{rootDir}/{subDir}/Ground/*"))
-        # k = math.inf
-        # for dir in glob(f"{rootDir}/{subDir}/Frame/*"):
-        #     frames = glob(f"{dir}/*")
-        #     k = len(frames) if len(frames) < k else k
-        # self.batch_size = k
-        # self.n_video = 0
-        # self.nextVideo()
+        video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
+        video_Ground_List = sorted(glob(f"{rootDir}/{subDir}/Ground/*"))
 
-    def __getitem__(self,i:int):
-        videospath = self.video_Frame_List[i]
-        #video = []
-        video_resize = []
+        self.all_Video_Frame = []
+        for video in video_Frame_List:
+            self.all_Video_Frame += sorted(glob(f"{video}/*"))
         
-        for imgpath in sorted(glob(videospath+"/*")):
-            # img = cv2.imread(imgpath)
-            # img = cv2.resize(img, dsize = (256, 256))
-            # img = img / 255
-            # img = torch.from_numpy(img.astype(np.float32)).clone()
-            #img = img.permute(2, 0, 1)
-            im = Image.open(imgpath)
-            # img = pil_to_tensor(im)
-            # img = img.permute(2, 0, 1)
-            # video.append(img)
+        self.all_Video_Ground = []
+        for ground in video_Ground_List:
+            self.all_Video_Ground += sorted(glob(f"{ground}/*"))
 
-            im_resize = im.resize((256,256))
-            img_resize = pil_to_tensor(im_resize)
-            img_resize = img_resize.permute(2, 0, 1)
-            video_resize.append(img_resize/255)
-        
-        
-        labelspaths = self.video_Ground_List[i]
-        #label = []
-        label_resize = []
-        for labelspath in sorted(glob(labelspaths+"/*")):
-            im = Image.open(labelspath)
-            # img = pil_to_tensor(im)
-            # img = img.permute(2, 0, 1)
-            # label.append(img)
-
-            im_resize = im.resize((256,256))
-            img_resize = pil_to_tensor(im_resize)
-            img_resize = img_resize.permute(2, 0, 1)
-            label_resize.append(img_resize/255)
-
-        return video_resize,label_resize,videospath
+    def __len__(self):
+        return len(self.all_Video_Frame)
     
-    # def __iter__(self):
-    #     imgs_resize = []
-    #     labels_resize = []
+    def __getitem__(self,i):
+        spatialFramePath = self.all_Video_Frame[i]
+        spatialGroundPath = self.all_Video_Ground[i]
+        if i == len(self.all_Video_Frame)-1:
+            temporalFramePath = self.all_Video_Frame[i]
+            temporalGroundPath = self.all_Video_Ground[i]
+        else:
+            temporalFramePath = self.all_Video_Frame[i+1] if (
+                                self.all_Video_Frame[i+1].split("/")[-2] == spatialFramePath.split("/")[-2]
+                                ) else self.all_Video_Frame[i]
+            temporalGroundPath = self.all_Video_Ground[i+1] if (
+                                self.all_Video_Ground[i+1].split("/")[-2] == spatialGroundPath.split("/")[-2]
+                                ) else self.all_Video_Ground[i]
 
-    #     if len(self.images_path) < self.batch_size:
-    #         #print("QUI", len(self.images_path))
-    #         self.nextVideo()
-
-    #     #for _ in range(self.batch_size):
-    #     img_path = self.images_path[0]
-    #     img = Image.open(img_path)
-    #     img_resize = img.resize((256,256))
-    #     img_resize = pil_to_tensor(img_resize)
-    #     img_resize = img_resize.permute(2,0,1)
-    #     imgs_resize.append(img_resize/255)
-    #     self.images_path = self.images_path[1:]
-
-    #     label_path = self.labels_path[0]
-    #     label = Image.open(label_path)
-    #     label_resize = label.resize((256,256))
-    #     label_resize = pil_to_tensor(label_resize)
-    #     label_resize = label_resize.permute(2,0,1)
-    #     labels_resize.append(label_resize/255)
-    #     self.labels_path = self.labels_path[1:]
+        #open spatial/temporal Frame and Ground
+        imgSpatialFrame = Image.open(spatialFramePath)
+        imgTemporalFrame = Image.open(temporalFramePath)
         
-    #     yield img_resize/255,label_resize/255,self.images_path[:self.batch_size]
-    
-    def __len__(self) -> int:
-        return len(self.video_Frame_List)#sum([len(glob(f"{dir}/*")) for dir in self.video_Frame_List])
-    
-    # def nextVideo(self) -> None:
-    #     self.n_video += 1
-    #     videosPath = self.video_Frame_List[self.n_video]
-    #     labelPath = self.video_Ground_List[self.n_video]
-    #     self.images_path = sorted(glob(videosPath+"/*"))
-    #     self.labels_path = sorted(glob(labelPath+"/*"))
+        imgSpatialGround = Image.open(spatialGroundPath)
+        imgTemporalGround = Image.open(temporalGroundPath)
 
-def newTeacherLoader(rootDir:str, runType:str) ->DataLoader:
+        #resize spatial/temporal Frame and Ground
+        imgSpatialFrame = imgSpatialFrame.resize((256,256))
+        imgTemporalFrame = imgTemporalFrame.resize((256,256))
+        
+        imgSpatialGround = imgSpatialGround.resize((256,256))
+        imgTemporalGround = imgTemporalGround.resize((256,256))
+
+        #from PIL to Tensor spatial/temporal Frame and Ground
+        imgSpatialFrame = pil_to_tensor(imgSpatialFrame)
+        imgTemporalFrame = pil_to_tensor(imgTemporalFrame)
+        
+        imgSpatialGround = pil_to_tensor(imgSpatialGround)
+        imgTemporalGround = pil_to_tensor(imgTemporalGround)
+
+        #permute spatial/temporal Frame and Ground
+        imgSpatialFrame = imgSpatialFrame.permute(2, 0, 1)
+        imgTemporalFrame = imgTemporalFrame.permute(2, 0, 1)
+
+        imgSpatialGround = imgSpatialGround.permute(2, 0, 1)
+        imgTemporalGround = imgTemporalGround.permute(2, 0, 1)
+
+        return (imgSpatialFrame/255,imgTemporalFrame/255),(imgSpatialGround/255,imgTemporalGround/25)
+
+# def newTeacherLoader(rootDir:str, runType:str) ->DataLoader:
+#     if runType.lower() == "test":
+#         subDir = "testSet"
+#     elif runType.lower() == "valid":
+#         subDir = "validSet"
+#     else:
+#         subDir = "trainSet"
+#     return DataLoader(AVS1KDataSetTeacher(rootDir,subDir), shuffle=True)
+
+def newLoader(datasetCLass:any,rootDir:str, runType:str) -> DataLoader:
     if runType.lower() == "test":
         subDir = "testSet"
     elif runType.lower() == "valid":
         subDir = "validSet"
     else:
         subDir = "trainSet"
-    return DataLoader(AVS1KDataSetTeacher(rootDir,subDir), shuffle=True)
-
-def newLoader(rootDir:str, runType:str) -> DataLoader:
-    if runType.lower() == "test":
-        subDir = "testSet"
-    elif runType.lower() == "valid":
-        subDir = "validSet"
-    else:
-        subDir = "trainSet"
-    return DataLoader(AVS1KDataSet(rootDir,subDir), shuffle=True)
+    return DataLoader(datasetCLass(rootDir,subDir), shuffle=True)
 
 
 

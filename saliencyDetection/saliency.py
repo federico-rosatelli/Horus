@@ -15,13 +15,13 @@ logging.getLogger("matplotlib.font_manager").propagate = False
 
 
 
-train = dtL.newLoader(ROOT_DIR,TRAIN_SET)
-valid = dtL.newLoader(ROOT_DIR,VALID_SET)
-test = dtL.newLoader(ROOT_DIR,TEST_SET)
+train = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TRAIN_SET)
+valid = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,VALID_SET)
+test = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TEST_SET)
 
-trainT = dtL.newTeacherLoader(ROOT_DIR,TRAIN_SET)
-validT = dtL.newTeacherLoader(ROOT_DIR,VALID_SET)
-testT = dtL.newTeacherLoader(ROOT_DIR,TEST_SET)
+trainT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,TRAIN_SET)
+validT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,VALID_SET)
+testT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,TEST_SET)
 
 
 class HorusModelTeacher(nn.Module):
