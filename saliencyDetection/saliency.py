@@ -124,7 +124,7 @@ class HorusModel(nn.Module):
 # model.to(device)
     
 class Horus:
-    HOME_PATH:str = "saliencyDetection/"
+    HOME_PATH:str = f"{DIR}/"
     model:HorusModel = None
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     def __init__(self,model_file:str="horus_model.pt",state_dict:bool=False) -> None:
@@ -152,6 +152,8 @@ def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_m
         os.remove(f"{DIR}/{model_name}")
     if verbose:
         logger = logging.getLogger(verbose)
+    
+    files = conf["saliencyDetection"]["teacher"]["files"]
     config = conf["saliencyDetection"]["teacher"]["training"]
     epochs = int(config["epochs"])
     if epochs < 0 or epochs > 4096:
@@ -171,9 +173,8 @@ def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_m
     optimizer = torch.optim.Adam(model.parameters(),learning_rate)
 
     model.train()
-    optimizer.zero_grad()
 
-    history = []
+    #history = []
     mean_history = []
     min_mean_batch_loss = 1
     min_loss = 1
@@ -183,42 +184,43 @@ def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_m
         for batch,(img,label) in enumerate(trainT):
             x = img.to(device)
             y = label.to(device)
-
+            
+            optimizer.zero_grad()
             predict = model(x)
             loss = loss_fn(predict,y)
             loss.backward()
             optimizer.step()
             loss = loss.item()
             #logger.info(loss)
-            history.append(loss)
+            #history.append(loss)
             batch_history.append((predict,y,loss))
             if batch % batch_size == 0 and batch != 0:
-                mean_loss = sum(history)/len(history)
+                #mean_loss = sum(history)/len(history)
                 mean_loss_batch = sum([z[2] for z in batch_history])/len(batch_history)
                 
                 if verbose:
-                    logger.info(f"Mean Loss: {mean_loss} - Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
+                    logger.info(f"Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
                 
-                mean_history.append(mean_loss)
+                mean_history.append(mean_loss_batch)
                 min_batch_loss = min(batch_history,key=lambda z:z[2])
                 
-                show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2])
+                show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2],"test.png")
                 batch_history = []
-                if min_mean_batch_loss > mean_loss_batch:
-                    min_mean_batch_loss = mean_loss_batch
-                    torch.save(model.state_dict(), f"{DIR}/{model_name}")
+                if sum(mean_history)/len(mean_history) >= mean_loss_batch:
+                    #min_mean_batch_loss = mean_loss_batch
+                    torch.save(model.state_dict(), f"{DIR}/{files['Model']}")
                     if verbose:
-                        logger.info(f"Saving batch {batch} in model")
+                        logger.info(f"Saving batch {batch} in model {sum(mean_history)/len(mean_history)} < {mean_loss_batch}")
                     
 
             if loss<min_loss:
                 min_loss = loss
                 logger.info(f"Min Loss: {min_loss} at {batch}")
+                show(predict,y,loss,"test_min.png")
     json_dict = {
-        "history":history,
         "mean_history":mean_history
     }
-    with open(f"{DIR}/{config['file']}","w") as out:
+    with open(f"{DIR}/{files['JSONFormat']}","w") as out:
         json.dump(json_dict,out,indent=4)
 
 
@@ -305,7 +307,7 @@ def trainHorus(epoch:int=10,verbose:str|None=None):
 
 
 
-def show(img,label,min_loss)->None:
+def show(img,label,min_loss,file_name)->None:
     
     # # print(img)
     # #image = (255.0 * img).to(torch.uint8)
@@ -340,8 +342,11 @@ def show(img,label,min_loss)->None:
     #fig.suptitle(f'Image & Label of {self.type}/{self.item} on Frame:{self.nframe}', fontsize=10)
     plt.tight_layout()
     plt.title(f"Min Loss: {min_loss}")
-    plt.savefig(f"testss/img/test.png")
+    plt.savefig(f"testss/img/{file_name}")
+    plt.clf()
+    plt.close("all")
     plt.close(fig)
+    plt.ioff()
 
 
 
