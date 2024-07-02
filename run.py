@@ -30,7 +30,7 @@ def main(args:argparse.Namespace,conf:any,logger:logging.Logger) -> None:
     start_time = time.time()
     try:
         if args.build:
-            saliency.trainTeacher(conf,verbose=args.verbose)
+            saliency.trainHorus(conf["saliencyDetection"]["student"],verbose=args.verbose)
 
         elif args.test:
             tests.unitTestCollider()

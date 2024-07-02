@@ -10,6 +10,15 @@ saliencyDetection:
                   learning_rate:    0.0001
                   epochs:           12
                   batch_size:       100
+      
+      student:
+            files: 
+                  JSONFormat:       trainStudent.json
+                  Model:            horus_student_model.pt
+            training:
+                  learning_rate:    0.0001
+                  epochs:           120
+                  batch_size:       100
 
 
 

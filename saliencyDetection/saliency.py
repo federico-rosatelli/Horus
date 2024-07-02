@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from torchvision import transforms
 
 import logging
 
@@ -88,7 +89,6 @@ class HorusModel(nn.Module):
 
 
     def forward(self, x):
-        print(x.size)
         x = self.conv16(x)
         x = self.relu(x)
         x = self.conv256_16(x)
@@ -147,14 +147,16 @@ class Horus:
         return pred.detach().cpu().numpy()
 
 
-def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_model.pt"):
-    if os.path.isfile(f"{DIR}/{model_name}"):
-        os.remove(f"{DIR}/{model_name}")
+def trainTeacher(conf:any,verbose:str|None=None):
+    files = conf["files"]
+    
+    if os.path.isfile(f"{DIR}/{files['Model']}"):
+        os.remove(f"{DIR}/{files['Model']}")
     if verbose:
         logger = logging.getLogger(verbose)
     
-    files = conf["saliencyDetection"]["teacher"]["files"]
-    config = conf["saliencyDetection"]["teacher"]["training"]
+    
+    config = conf["training"]
     epochs = int(config["epochs"])
     if epochs < 0 or epochs > 4096:
         raise ValueError(f"Value for build must be > 0 & < 4097 not {epochs}")
@@ -210,7 +212,7 @@ def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_m
                     #min_mean_batch_loss = mean_loss_batch
                     torch.save(model.state_dict(), f"{DIR}/{files['Model']}")
                     if verbose:
-                        logger.info(f"Saving batch {batch} in model {sum(mean_history)/len(mean_history)} < {mean_loss_batch}")
+                        logger.info(f"Saving batch {batch} in model")
                     
 
             if loss<min_loss:
@@ -224,9 +226,23 @@ def trainTeacher(conf:any,verbose:str|None=None,model_name:str="horus__teacher_m
         json.dump(json_dict,out,indent=4)
 
 
-def trainHorus(epoch:int=10,verbose:str|None=None):
+def trainHorus(conf:any,verbose:str|None=None):
+    files = conf["files"]
+    
+    if os.path.isfile(f"{DIR}/{files['Model']}"):
+        os.remove(f"{DIR}/{files['Model']}")
     if verbose:
         logger = logging.getLogger(verbose)
+    
+    
+    config = conf["training"]
+    epochs = int(config["epochs"])
+    if epochs < 0 or epochs > 4096:
+        raise ValueError(f"Value for build must be > 0 & < 4097 not {epochs}")
+    
+    batch_size = int(config["batch_size"])
+    if batch_size < 0 or batch_size > len(trainT):
+        raise ValueError(f"Value for build must be > 0 & < {len(trainT)} not {batch_size}")
     model = HorusModel()
     device = torch.device("cpu")
     model = model.to(device)
@@ -235,111 +251,74 @@ def trainHorus(epoch:int=10,verbose:str|None=None):
     loss_fn = nn.MSELoss()
 
     optimizer = torch.optim.Adam(model.parameters(),learning_rate)
-    min_loss = 0
+    mean_history = []
+    batch_history = []
     model.train()
-    for k in range(epoch):
-        for img,label,name in train:
-            mean = 0
-            #print(len(img),name)
-            for i in range(len(img)-1):
-                
-                x_spatial = img[i]
-                y_spatial = label[i]
-                x_temporal = [img[i],img[i+1]]
-                y_temporal = [label[i],label[i+1]]
-                #print(x_spatial.shape)
-                x_spatial = x_spatial.to(device)
-                y_spatial = y_spatial.to(device)
-                pre_spatial = model(x_spatial)
-
-                loss = loss_fn(pre_spatial,y_spatial)
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-                loss = loss.item()
-                mean += loss
-                
-                if loss>0.02:
-                    if verbose:
-                        logger.info(f"loss saved: {loss} for {name[0]}")
-                    show(pre_spatial,y_spatial,img[i])
-                    #print("QUANTI 0? ",np.count_nonzero(pre_spatial==0),np.count_nonzero(pre_spatial!=0))
-                if loss > min_loss:
-                    min_loss = loss
-                    if verbose:
-                        logger.info(f"{loss} in: {i}")
-                    
-                    # if loss>0.03:
-                    #     show(pre_spatial,y_spatial,loss)
-               
-
-
+    min_loss = 1
+    for k in range(epochs):
+        for batch,(imgs,labels) in enumerate(train):
             
-    # for k in range(epoch):
-    #     mean = 0
-    #     print(f"{k} EPOCH")
-    #     for i in range(len(train)):
-    #         for x,y,z in train:
-    #             # for i in range(len(x)):
-    #             #     x[i] = x[i].to(device)
-    #             #     y[i] = y[i].to(device)
-    #             x = x.to(device)
-    #             y = y.to(device)
+            spatial_x, spatial_y = imgs[0].to(device), labels[0].to(device)
+            #print(len(img),name)
+            optimizer.zero_grad()
+            predict = model(spatial_x)
+            loss = loss_fn(predict,spatial_y)
+            loss.backward()
+            optimizer.step()
+            loss = loss.item()
+            batch_history.append((predict,spatial_y,loss))
+            if batch % batch_size == 0 and batch != 0:
+                #mean_loss = sum(history)/len(history)
+                mean_loss_batch = sum([z[2] for z in batch_history])/len(batch_history)
+                
+                if verbose:
+                    logger.info(f"Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
+                
+                mean_history.append(mean_loss_batch)
+                min_batch_loss = min(batch_history,key=lambda z:z[2])
+                
+                show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2],"test_studente.png",(256,256,1))
+                batch_history = []
+                if sum(mean_history)/len(mean_history) >= mean_loss_batch:
+                    #min_mean_batch_loss = mean_loss_batch
+                    torch.save(model.state_dict(), f"{DIR}/{files['Model']}")
+                    if verbose:
+                        logger.info(f"Saving batch {batch} in model")
+                    
 
-    #             pred = model(x)
-    #             #print(pred.shape,y.shape)
-    #             loss = loss_fn(pred,y)
-
-    #             optimizer.zero_grad()
-    #             loss.backward()
-    #             optimizer.step()
-    #             loss = loss.item()
-    #             mean += loss
-    #             if loss > min_loss:
-    #                 min_loss = loss
-    #                 print(f"{loss} in: {i}")
-    #                 print(f"mean loss: {mean/(i+1)}")
-    #                 # if loss>0.06:
-    #                 #     show(pred,y)
-        if verbose:
-            logger.warning(f"mean loss: {mean/len(train)}")
+            if loss<min_loss:
+                min_loss = loss
+                logger.info(f"Min Loss: {min_loss} at {batch}")
+                show(predict,spatial_y,loss,"test_min_student.png",(256,256,1))
+    json_dict = {
+        "mean_history":mean_history
+    }
+    with open(f"{DIR}/{files['JSONFormat']}","w") as out:
+        json.dump(json_dict,out,indent=4)
 
 
 
-
-def show(img,label,min_loss,file_name)->None:
+def show(img,label,min_loss,file_name,size=(720,1280,1))->None:
     
-    # # print(img)
-    # #image = (255.0 * img).to(torch.uint8)
-    # print(type(img))
-    #print(img.size(),label.size())
-    #image = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
-    # # print(image.shape)
-    # image = image[:, :, :, ::-1]
-    # print(image.shape)
-    #cv2.imwrite("testss/img/test.png",image)
-
-
-    #np.save("testss/img/test.png", img.detach().cpu().numpy())
+    
     fig, axarr = plt.subplots(1,2)
+    if size == (256,256,1):
+        
+        img = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
+        
+        grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
+        img = grayscale_transform(torch.from_numpy(np.array(img)).float())
+        img = torch.from_numpy(np.array(img)).float().squeeze(0)
     
-    # grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
-    # grayscale_tensor = grayscale_transform(torch.from_numpy(np.array(image)).float())
-    #grayscale_tensor = torch.from_numpy(np.array(image)).float().squeeze(0)
-    
-    axarr[0].imshow((img*255).detach().numpy().reshape(720,1280,1))
+    axarr[0].imshow((img*255).detach().numpy().reshape(size[0],size[1],size[2]))
     axarr[0].set_title('Image')
     axarr[0].axis('off')
 
-    axarr[1].imshow((label*255).detach().numpy().reshape(720,1280,1))
+    axarr[1].imshow((label*255).detach().numpy().reshape(size[0],size[1],size[2]))
     axarr[1].set_title('Label')
     axarr[1].axis('off')
 
-    # axarr[2].imshow((img1).detach().numpy().reshape(256,256,-1))
-    # axarr[2].set_title('Original Img')
-    # axarr[2].axis('off')
-
-    #fig.suptitle(f'Image & Label of {self.type}/{self.item} on Frame:{self.nframe}', fontsize=10)
+    
     plt.tight_layout()
     plt.title(f"Min Loss: {min_loss}")
     plt.savefig(f"testss/img/{file_name}")
