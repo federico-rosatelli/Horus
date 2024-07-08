@@ -24,6 +24,13 @@ handlers:
         filename: logs/horus.log
         mode: a
 
+    fileTesting:
+        class: logging.FileHandler
+        level: DEBUG
+        formatter: infile
+        filename: logs/horus_test.log
+        mode: a
+
 loggers:
     development:
         level: DEBUG
@@ -38,6 +45,11 @@ loggers:
     production:
         level: INFO
         handlers: [file]
+        propagate: no
+    
+    testing:
+        level: DEBUG
+        handlers: [console, fileTesting]
         propagate: no
 
 root:

@@ -2,23 +2,22 @@ version: 0.01a
 
 
 saliencyDetection:
-      teacher:
-            files: 
-                  JSONFormat:       trainTeacher.json
-                  Model:            horus_teacher_model.pt
-            training:
+
+      files:
+            LossHistory:       loss_history.json
+            Model:            horus_model.pt
+
+      training:
+            epochs:           120
+            batch_size:       100
+
+            teacher:
                   learning_rate:    0.0001
-                  epochs:           12
-                  batch_size:       100
+                  
       
-      student:
-            files: 
-                  JSONFormat:       trainStudent.json
-                  Model:            horus_student_model.pt
-            training:
+            student:
                   learning_rate:    0.0001
-                  epochs:           120
-                  batch_size:       100
+                        
 
 
 

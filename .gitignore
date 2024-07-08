@@ -11,4 +11,3 @@ tester/__pycache__/*
 *.mp4
 *.log
 !public/images/*.png
-!logs/*.log

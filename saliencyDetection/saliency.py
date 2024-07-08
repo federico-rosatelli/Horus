@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 from saliencyDetection.dataLoader import dataLoader as dtL
+import saliencyDetection.lossFunction as lossFunction
 from . import *
 import json
 import os
@@ -16,14 +17,17 @@ logging.getLogger("matplotlib.font_manager").propagate = False
 
 
 
-train = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TRAIN_SET)
-valid = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,VALID_SET)
-test = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TEST_SET)
+trainS = dtL.newLoader(dtL.AVS1KDataSetStudent,ROOT_DIR,TRAIN_SET)
+validS = dtL.newLoader(dtL.AVS1KDataSetStudent,ROOT_DIR,VALID_SET)
+testS = dtL.newLoader(dtL.AVS1KDataSetStudent,ROOT_DIR,TEST_SET)
 
 trainT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,TRAIN_SET)
 validT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,VALID_SET)
 testT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,TEST_SET)
 
+train = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TRAIN_SET)
+valid = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,VALID_SET)
+test = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TEST_SET)
 
 class HorusModelTeacher(nn.Module):
     def __init__(self):
@@ -142,6 +146,9 @@ class Horus:
         self.model.eval()
     
     def predict(self,img:any) -> np.ndarray:
+        """
+        Prediction of any image type based on saved model
+        """
         img = img.to(self.device)
         pred = self.model(img)
         return pred.detach().cpu().numpy()
@@ -170,6 +177,7 @@ def trainTeacher(conf:any,verbose:str|None=None):
     model = model.to(device)
 
     learning_rate = float(config["learning_rate"])
+    my_loss_fn = lossFunction.HorusLossFunction()
     loss_fn = nn.MSELoss()
 
     optimizer = torch.optim.Adam(model.parameters(),learning_rate)
@@ -229,8 +237,8 @@ def trainTeacher(conf:any,verbose:str|None=None):
 def trainHorus(conf:any,verbose:str|None=None):
     files = conf["files"]
     
-    if os.path.isfile(f"{DIR}/{files['Model']}"):
-        os.remove(f"{DIR}/{files['Model']}")
+    # if os.path.isfile(f"{DIR}/{files['Model']}"):
+    #     os.remove(f"{DIR}/{files['Model']}")
     if verbose:
         logger = logging.getLogger(verbose)
     
@@ -243,58 +251,114 @@ def trainHorus(conf:any,verbose:str|None=None):
     batch_size = int(config["batch_size"])
     if batch_size < 0 or batch_size > len(trainT):
         raise ValueError(f"Value for build must be > 0 & < {len(trainT)} not {batch_size}")
-    model = HorusModel()
+    
     device = torch.device("cpu")
-    model = model.to(device)
+    
+    modelT = HorusModelTeacher()    # model for teacher
+    modelS = HorusModel()           # model for student
+    modelT = modelT.to(device)
+    modelS = modelS.to(device)
 
-    learning_rate = 0.0001
-    loss_fn = nn.MSELoss()
 
-    optimizer = torch.optim.Adam(model.parameters(),learning_rate)
+    learning_rateT = config["teacher"]["learning_rate"]
+    learning_rateS = config["student"]["learning_rate"]
+    #loss_fn = nn.MSELoss()
+
+    my_loss_fn = lossFunction.HorusLossFunction()   # my custom loss function
+
+    optimizerT = torch.optim.Adam(modelT.parameters(),learning_rateT)
+    optimizerS = torch.optim.Adam(modelS.parameters(),learning_rateS)
     mean_history = []
     batch_history = []
-    model.train()
+    modelT.train()
+    modelS.train()
     min_loss = 1
     for k in range(epochs):
+        if verbose:
+            logger.info(f"EPOCH: {k+1} of {epochs}")
         for batch,(imgs,labels) in enumerate(train):
             
-            spatial_x, spatial_y = imgs[0].to(device), labels[0].to(device)
-            #print(len(img),name)
-            optimizer.zero_grad()
-            predict = model(spatial_x)
-            loss = loss_fn(predict,spatial_y)
+            teacher_x_st,student_x_st = imgs
+            teacher_y_st,student_y_st = labels
+
+            teacher_x_s = teacher_x_st[0].to(device)
+            teacher_x_t = teacher_x_st[1].to(device)
+
+            student_x_s = student_x_st[0].to(device)
+            student_x_t = student_x_st[1].to(device)
+
+            teacher_y_s = teacher_y_st[0].to(device)
+            teacher_y_t = teacher_y_st[1].to(device)
+
+            student_y_s = student_y_st[0].to(device)
+            student_y_t = student_y_st[1].to(device)
+
+            
+            optimizerT.zero_grad()
+            optimizerS.zero_grad()
+
+            predictT = modelT(teacher_x_s)
+            predictS = modelS(student_x_s)
+
+            loss = my_loss_fn(predictT,predictS,teacher_y_s)
             loss.backward()
-            optimizer.step()
+
+            optimizerT.step()
+            optimizerS.step()
+
             loss = loss.item()
-            batch_history.append((predict,spatial_y,loss))
+
+            batch_history.append(loss)
+
             if batch % batch_size == 0 and batch != 0:
-                #mean_loss = sum(history)/len(history)
-                mean_loss_batch = sum([z[2] for z in batch_history])/len(batch_history)
                 
-                if verbose:
-                    logger.info(f"Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
-                
+                mean_loss_batch = sum(batch_history)/len(batch_history)
                 mean_history.append(mean_loss_batch)
-                min_batch_loss = min(batch_history,key=lambda z:z[2])
+                min_batch_loss = min(batch_history)
+
+                lasts_loss = mean_history[-abs(len(mean_history)*0.2):]
+                mean_lasts_loss = sum(lasts_loss)/len(lasts_loss)
+
+                if verbose:
+                    logger.info(f"Mean Batch Loss: {mean_loss_batch} ¦ Min Loss: {min_batch_loss} ¦ {batch} to {len(trainT)}")
                 
-                show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2],"test_studente.png",(256,256,1))
-                batch_history = []
-                if sum(mean_history)/len(mean_history) >= mean_loss_batch:
-                    #min_mean_batch_loss = mean_loss_batch
-                    torch.save(model.state_dict(), f"{DIR}/{files['Model']}")
+                if mean_loss_batch <= mean_lasts_loss:
+                    torch.save(modelS.state_dict(), f"{DIR}/{files['Model']}")
                     if verbose:
                         logger.info(f"Saving batch {batch} in model")
-                    
-
+            
             if loss<min_loss:
                 min_loss = loss
                 logger.info(f"Min Loss: {min_loss} at {batch}")
-                show(predict,spatial_y,loss,"test_min_student.png",(256,256,1))
-    json_dict = {
-        "mean_history":mean_history
-    }
-    with open(f"{DIR}/{files['JSONFormat']}","w") as out:
-        json.dump(json_dict,out,indent=4)
+    #         batch_history.append((predict,spatial_y,loss))
+    #         if batch % batch_size == 0 and batch != 0:
+                
+    #             mean_loss_batch = sum([z[2] for z in batch_history])/len(batch_history)
+                
+    #             if verbose:
+    #                 logger.info(f"Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
+                
+    #             mean_history.append(mean_loss_batch)
+    #             min_batch_loss = min(batch_history,key=lambda z:z[2])
+                
+    #             show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2],"test_studente.png",(256,256,1))
+    #             batch_history = []
+    #             if sum(mean_history)/len(mean_history) >= mean_loss_batch:
+    #                 #min_mean_batch_loss = mean_loss_batch
+    #                 torch.save(model.state_dict(), f"{DIR}/{files['Model']}")
+    #                 if verbose:
+    #                     logger.info(f"Saving batch {batch} in model")
+                    
+
+    #         if loss<min_loss:
+    #             min_loss = loss
+    #             logger.info(f"Min Loss: {min_loss} at {batch}")
+    #             show(predict,spatial_y,loss,"test_min_student.png",(256,256,1))
+    # json_dict = {
+    #     "mean_history":mean_history
+    # }
+    # with open(f"{DIR}/{files['JSONFormat']}","w") as out:
+    #     json.dump(json_dict,out,indent=4)
 
 
 
