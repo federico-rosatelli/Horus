@@ -4,7 +4,7 @@ version: 0.01a
 saliencyDetection:
 
       files:
-            LossHistory:       loss_history.json
+            LossHistory:      loss_history.json
             Model:            horus_model.pt
 
       training:
