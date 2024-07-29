@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
+import numpy as np
+import logging
+logging.getLogger("numpy").propagate = False
 
 U = 0.5
 
@@ -10,27 +11,36 @@ class HorusLossFunction(nn.Module):
     Custom Loss Function implementing Soft & Hard Loss
     """
     @staticmethod
-    def forward(ys_pred, yt_pred, y):    
-        #ctx.save_for_backward(ys_pred,yt_pred , y)
-        return Loss(ys_pred,yt_pred,y)
+    def forward(s_res, t_res):    
+        return Loss(s_res,t_res)
+
+
+def Loss(spatial_result,temporal_result) -> float:
+    teacher_s_result,student_s_result,ground_s_map = spatial_result
+    teacher_s_resize = np.resize(teacher_s_result.detach().numpy(),(256,256))
+    ground_s_resize = np.resize(ground_s_map.detach().numpy(),(256,256))
     
-    # @staticmethod
-    # def backward(ctx, grad_output):
-    #     y_pred, y = ctx.saved_tensors
-    #     grad_input = 2 * (y_pred - y) / y_pred.shape[0]     #da modificare   
-    #     return grad_input, None
+    slS = SHLoss(student_s_result,torch.from_numpy(teacher_s_resize))               # soft loss (student_pred_spt, teacher_pred_spt)
+    hlS = SHLoss(student_s_result,torch.from_numpy(ground_s_resize))                # hard loss (student_pred_stp, teacher_ground_spt)
 
-def Loss(teacher_result:torch.Tensor,student_result:torch.Tensor,ground_map:torch.Tensor) -> float:
-    # TODO: ??? reshape [1, 720, 1, 1280] to [1,256,3,256]
-    print(teacher_result.size(),student_result.size())
-    teacher_resize = teacher_result.view(1,256,3,1,1280)
-    ground_resize = ground_resize.view(1,256,3,1,1280)
-    teacher_resize = F.interpolate(teacher_result,size=(256, 256), mode='bilinear', align_corners=False)
-    ground_resize = F.interpolate(ground_map,size=(256, 256), mode='bilinear', align_corners=False)
-    sl = SHLoss(student_result,teacher_resize)
-    hl = SHLoss(student_result,ground_resize)
+    L1 =  U*slS + (1-U)*hlS
 
-    return U*sl + (1-U)*hl
+    teacher_t_result,student_t_result,ground_t_map = temporal_result
+    teacher_t_resize = np.resize(teacher_t_result.detach().numpy(),(256,256))
+    ground_t_resize = np.resize(ground_t_map.detach().numpy(),(256,256))
+    
+    slT = SHLoss(student_t_result,torch.from_numpy(teacher_t_resize))               # soft loss (student_pred_tem, teacher_pred_tem)
+    hlT = SHLoss(student_t_result,torch.from_numpy(ground_t_resize))                # hard loss (student_pred_tem, teacher_ground_tem)
+
+    L2 =  U*slT + (1-U)*hlT
+
+    return (
+            (L1**2)+
+            (L2**2)
+        )/2
+    # s = U*sls + (1-U)*hls
+    # t = U*slt + (1-U)*hlt
+    # return math.sqrt(s**2 + t**2)
 
 
 
@@ -44,5 +54,5 @@ def SHLoss(student_result:torch.Tensor,teacher_result:torch.Tensor) -> float:
     norm = torch.norm(diff, p=2)
     return (
         1/(h * w)
-    ) * norm.item()
+    ) * norm    # !!!!.item()
 

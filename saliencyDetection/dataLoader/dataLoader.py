@@ -1,5 +1,4 @@
 from glob import glob
-import math
 from matplotlib import pyplot as plt
 from PIL import Image
 import random
@@ -196,14 +195,14 @@ class AVS1KDataSetStudent:
 #         subDir = "trainSet"
 #     return DataLoader(AVS1KDataSetTeacher(rootDir,subDir), shuffle=True)
 
-def newLoader(datasetCLass:any,rootDir:str, runType:str) -> DataLoader:
+def newLoader(datasetCLass:any,rootDir:str, runType:str, batch_size:int=64) -> DataLoader:
     if runType.lower() == "test":
         subDir = "testSet"
     elif runType.lower() == "valid":
         subDir = "validSet"
     else:
         subDir = "trainSet"
-    return DataLoader(datasetCLass(rootDir,subDir), shuffle=True)
+    return DataLoader(datasetCLass(rootDir,subDir), shuffle=True,batch_size=batch_size)
 
 
 

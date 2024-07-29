@@ -2,7 +2,6 @@
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 from . import *
-from PIL import Image
 import cv2
 from uuid import *
 import numpy as np
@@ -10,6 +9,7 @@ from evaluation import borderEval,evaluator
 from objectDetection import visDrone
 import subprocess
 import os
+
 
 
 class Wrapper:

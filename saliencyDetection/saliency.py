@@ -1,3 +1,6 @@
+import math
+import logging
+logging.getLogger("matplotlib").propagate = False
 from matplotlib import pyplot as plt
 from saliencyDetection.dataLoader import dataLoader as dtL
 import saliencyDetection.lossFunction as lossFunction
@@ -8,26 +11,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from torchvision import transforms
+from PIL import Image
+from torchvision.transforms.functional import pil_to_tensor
 
-import logging
 
 logging.getLogger("PIL.PngImagePlugin").propagate = False
 logging.getLogger("matplotlib.font_manager").propagate = False
 
 
 
-trainS = dtL.newLoader(dtL.AVS1KDataSetStudent,ROOT_DIR,TRAIN_SET)
-validS = dtL.newLoader(dtL.AVS1KDataSetStudent,ROOT_DIR,VALID_SET)
-testS = dtL.newLoader(dtL.AVS1KDataSetStudent,ROOT_DIR,TEST_SET)
 
-trainT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,TRAIN_SET)
-validT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,VALID_SET)
-testT = dtL.newLoader(dtL.AVS1KDataSetTeacher,ROOT_DIR,TEST_SET)
-
-train = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TRAIN_SET)
-valid = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,VALID_SET)
-test = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TEST_SET)
 
 class HorusModelTeacher(nn.Module):
     def __init__(self):
@@ -70,57 +63,98 @@ class HorusModel(nn.Module):
     def __init__(self):
         super(HorusModel, self).__init__()
 
+        
         # Define the layers for your model
-        self.conv16 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
-        self.conv256_16 = nn.Conv2d(256, 16, kernel_size=3, stride=1, padding=1)
-        self.relu = nn.ReLU()
+        # self.conv16 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
+        # self.conv256_16 = nn.Conv2d(256, 16, kernel_size=3, stride=1, padding=1)
+        # self.relu = nn.ReLU()
         
-        self.max16  = nn.MaxPool2d(1,1)
-        self.max32  = nn.MaxPool2d(1,1)
+        # self.max16  = nn.MaxPool2d(1,2)
+        # self.max32  = nn.MaxPool2d(2,2)
 
-        self.conv32 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)
-
-
-        self.conv64 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
-        self.conv64_64 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
-
-        self.conv128 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
-
-        self.conv256 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
-
-        self.convP = nn.Conv2d(1,1,kernel_size=3,stride=1,padding=1)
-        self.max256  = nn.MaxPool2d((1,2),(1,2))
+        # self.conv32 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)
 
 
-    def forward(self, x):
-        x = self.conv16(x)
-        x = self.relu(x)
-        x = self.conv256_16(x)
+        # self.conv64 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        # self.conv64_64 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+
+        # self.conv128 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+
+        # self.conv256 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+
+        # self.convP = nn.Conv2d(1,1,kernel_size=3,stride=1,padding=1)
+        # self.max256  = nn.MaxPool2d((1,2),(1,2))
+
+    
+        self.encoder = nn.Sequential(
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(256, 16, kernel_size=3, stride=1, padding=1),
+            nn.MaxPool2d(kernel_size=1, stride=2),
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU()
+        )
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(64, 32, kernel_size=1, stride=2),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 16, kernel_size=1, stride=2),
+            nn.ReLU(),
+            nn.Conv2d(16, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, padding=1)
+        )
+
+        
+
+
+    def forward(self, x, xt=None):
+        # if x1:
+        #     self.conv16 = nn.Conv2d(256, 256, kernel_size=6, stride=1, padding=1)
+
+        # x = self.conv16(x)
+        # x = self.relu(x)
+        # x = self.conv256_16(x)
         
 
         
-        x = self.max16(x)
+        # x = self.max16(x)
 
         
 
-        x = self.conv32(x)
+        # x = self.conv32(x)
 
 
-        x = self.max32(x)
+        # x = self.max32(x)
 
 
-        x = self.conv64(x)
-        x = self.relu(x)
-        x = self.conv64_64(x)
-        x = self.relu(x)
-        x = self.conv128(x)
-        x = self.relu(x)
-        #print(x.shape)
-        x = self.conv256(x)
-        #print(x.shape)
-        x = self.relu(x)
+        # x = self.conv64(x)
+        # x = self.relu(x)
+        # x = self.conv64_64(x)
+        # x = self.relu(x)
+        # x = self.conv128(x)
+        # x = self.relu(x)
+        # #print(x.shape)
+        # x = self.conv256(x)
+        # #print(x.shape)
+        # x = self.relu(x)
 
+        # return x
+        
+        x = self.encoder(x)
+        x = self.decoder(x)
+        padding = (0, 3)
+        x = F.pad(x, padding, mode='constant', value=0)
         return x
+
+
+        
+
 
 # Lsp = u * Ls * ()
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -130,7 +164,7 @@ class HorusModel(nn.Module):
 class Horus:
     HOME_PATH:str = f"{DIR}/"
     model:HorusModel = None
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
     def __init__(self,model_file:str="horus_model.pt",state_dict:bool=False) -> None:
         super(Horus,self).__init__()
 
@@ -149,108 +183,34 @@ class Horus:
         """
         Prediction of any image type based on saved model
         """
-        img = img.to(self.device)
+
+        # img = Image.open(img)
+        # img = img.resize((256,256))
+        # img = pil_to_tensor(img)
+        # img = img.permute(2, 0, 1)
+        # img = img.to(self.device)
         pred = self.model(img)
         return pred.detach().cpu().numpy()
 
-
-def trainTeacher(conf:any,verbose:str|None=None):
-    files = conf["files"]
-    
-    if os.path.isfile(f"{DIR}/{files['Model']}"):
-        os.remove(f"{DIR}/{files['Model']}")
-    if verbose:
-        logger = logging.getLogger(verbose)
-    
-    
-    config = conf["training"]
-    epochs = int(config["epochs"])
-    if epochs < 0 or epochs > 4096:
-        raise ValueError(f"Value for build must be > 0 & < 4097 not {epochs}")
-    
-    batch_size = int(config["batch_size"])
-    if batch_size < 0 or batch_size > len(trainT):
-        raise ValueError(f"Value for build must be > 0 & < {len(trainT)} not {batch_size}")
-
-    model = HorusModelTeacher()
-    device = torch.device("cpu")
-    model = model.to(device)
-
-    learning_rate = float(config["learning_rate"])
-    my_loss_fn = lossFunction.HorusLossFunction()
-    loss_fn = nn.MSELoss()
-
-    optimizer = torch.optim.Adam(model.parameters(),learning_rate)
-
-    model.train()
-
-    #history = []
-    mean_history = []
-    min_mean_batch_loss = 1
-    min_loss = 1
-    for k in range(epochs):
-        batch_history = []
-        logger.info(f"EPOCH: {k+1}")
-        for batch,(img,label) in enumerate(trainT):
-            x = img.to(device)
-            y = label.to(device)
-            
-            optimizer.zero_grad()
-            predict = model(x)
-            loss = loss_fn(predict,y)
-            loss.backward()
-            optimizer.step()
-            loss = loss.item()
-            #logger.info(loss)
-            #history.append(loss)
-            batch_history.append((predict,y,loss))
-            if batch % batch_size == 0 and batch != 0:
-                #mean_loss = sum(history)/len(history)
-                mean_loss_batch = sum([z[2] for z in batch_history])/len(batch_history)
-                
-                if verbose:
-                    logger.info(f"Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
-                
-                mean_history.append(mean_loss_batch)
-                min_batch_loss = min(batch_history,key=lambda z:z[2])
-                
-                show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2],"test.png")
-                batch_history = []
-                if sum(mean_history)/len(mean_history) >= mean_loss_batch:
-                    #min_mean_batch_loss = mean_loss_batch
-                    torch.save(model.state_dict(), f"{DIR}/{files['Model']}")
-                    if verbose:
-                        logger.info(f"Saving batch {batch} in model")
-                    
-
-            if loss<min_loss:
-                min_loss = loss
-                logger.info(f"Min Loss: {min_loss} at {batch}")
-                show(predict,y,loss,"test_min.png")
-    json_dict = {
-        "mean_history":mean_history
-    }
-    with open(f"{DIR}/{files['JSONFormat']}","w") as out:
-        json.dump(json_dict,out,indent=4)
 
 
 def trainHorus(conf:any,verbose:str|None=None):
     files = conf["files"]
     
-    # if os.path.isfile(f"{DIR}/{files['Model']}"):
-    #     os.remove(f"{DIR}/{files['Model']}")
     if verbose:
         logger = logging.getLogger(verbose)
     
     
     config = conf["training"]
     epochs = int(config["epochs"])
+    batch_saving = int(config["batch_saving"])
     if epochs < 0 or epochs > 4096:
         raise ValueError(f"Value for build must be > 0 & < 4097 not {epochs}")
     
+    # valid = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,VALID_SET)
+    # test = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TEST_SET)
     batch_size = int(config["batch_size"])
-    if batch_size < 0 or batch_size > len(trainT):
-        raise ValueError(f"Value for build must be > 0 & < {len(trainT)} not {batch_size}")
+    train = dtL.newLoader(dtL.AVS1KDataSet,ROOT_DIR,TRAIN_SET,batch_size)
     
     device = torch.device("cpu")
     
@@ -263,11 +223,12 @@ def trainHorus(conf:any,verbose:str|None=None):
     learning_rateT = config["teacher"]["learning_rate"]
     learning_rateS = config["student"]["learning_rate"]
     #loss_fn = nn.MSELoss()
-
+    
     my_loss_fn = lossFunction.HorusLossFunction()   # my custom loss function
 
-    optimizerT = torch.optim.Adam(modelT.parameters(),learning_rateT)
-    optimizerS = torch.optim.Adam(modelS.parameters(),learning_rateS)
+    optimizerT = torch.optim.AdamW(modelT.parameters(),learning_rateT)
+    optimizerS = torch.optim.AdamW(modelS.parameters(),learning_rateS)
+
     mean_history = []
     batch_history = []
     modelT.train()
@@ -294,85 +255,67 @@ def trainHorus(conf:any,verbose:str|None=None):
             student_y_t = student_y_st[1].to(device)
 
             
+            teacher_x_t = torch.cat((teacher_x_s,teacher_x_t))
+            teacher_y_t = torch.cat((teacher_y_s,teacher_y_t))
+
+            student_x_t = torch.cat((student_x_s,student_x_t))
+            student_y_t = torch.cat((student_y_s,student_y_t))
+            
             optimizerT.zero_grad()
             optimizerS.zero_grad()
 
             predictT = modelT(teacher_x_s)
+            predictTt = modelT(teacher_x_t)
             predictS = modelS(student_x_s)
+            predictSt = modelS(student_x_t)
 
-            loss = my_loss_fn(predictT,predictS,teacher_y_s)
+            loss = my_loss_fn((predictT,predictS,teacher_y_s),(predictTt,predictSt,teacher_y_t))
             loss.backward()
 
             optimizerT.step()
             optimizerS.step()
 
-            loss = loss.item()
+            loss = math.sqrt(loss.item())
 
             batch_history.append(loss)
 
-            if batch % batch_size == 0 and batch != 0:
+            if batch % batch_saving == 0 and batch != 0:
                 
                 mean_loss_batch = sum(batch_history)/len(batch_history)
                 mean_history.append(mean_loss_batch)
                 min_batch_loss = min(batch_history)
 
-                lasts_loss = mean_history[-abs(len(mean_history)*0.2):]
-                mean_lasts_loss = sum(lasts_loss)/len(lasts_loss)
+                # lasts_loss = mean_history[-int(len(mean_history)*0.2):]
+                # mean_lasts_loss = sum(lasts_loss)/len(lasts_loss)
+                min_mean_history = min(mean_history)
 
                 if verbose:
-                    logger.info(f"Mean Batch Loss: {mean_loss_batch} ¦ Min Loss: {min_batch_loss} ¦ {batch} to {len(trainT)}")
+                    logger.info(f"Mean Batch Loss: {mean_loss_batch} ¦ Min Loss: {min_batch_loss} ¦ {((batch*(k+1))/(len(train)*(k+1))):.2%}")
                 
-                if mean_loss_batch <= mean_lasts_loss:
+                if mean_loss_batch <= min_mean_history:
                     torch.save(modelS.state_dict(), f"{DIR}/{files['Model']}")
                     if verbose:
                         logger.info(f"Saving batch {batch} in model")
-            
+                batch_history = []
             if loss<min_loss:
                 min_loss = loss
                 logger.info(f"Min Loss: {min_loss} at {batch}")
-    #         batch_history.append((predict,spatial_y,loss))
-    #         if batch % batch_size == 0 and batch != 0:
-                
-    #             mean_loss_batch = sum([z[2] for z in batch_history])/len(batch_history)
-                
-    #             if verbose:
-    #                 logger.info(f"Mean Batch Loss: {mean_loss_batch}. {batch} to {len(trainT)}")
-                
-    #             mean_history.append(mean_loss_batch)
-    #             min_batch_loss = min(batch_history,key=lambda z:z[2])
-                
-    #             show(min_batch_loss[0],min_batch_loss[1],min_batch_loss[2],"test_studente.png",(256,256,1))
-    #             batch_history = []
-    #             if sum(mean_history)/len(mean_history) >= mean_loss_batch:
-    #                 #min_mean_batch_loss = mean_loss_batch
-    #                 torch.save(model.state_dict(), f"{DIR}/{files['Model']}")
-    #                 if verbose:
-    #                     logger.info(f"Saving batch {batch} in model")
-                    
-
-    #         if loss<min_loss:
-    #             min_loss = loss
-    #             logger.info(f"Min Loss: {min_loss} at {batch}")
-    #             show(predict,spatial_y,loss,"test_min_student.png",(256,256,1))
-    # json_dict = {
-    #     "mean_history":mean_history
-    # }
-    # with open(f"{DIR}/{files['JSONFormat']}","w") as out:
-    #     json.dump(json_dict,out,indent=4)
+                #show(predictS,student_y_s,loss,"test_min_cos.png")
 
 
 
-def show(img,label,min_loss,file_name,size=(720,1280,1))->None:
+
+def show(img,label,min_loss,file_name,size=(256,256,1))->None:
     
     
     fig, axarr = plt.subplots(1,2)
-    if size == (256,256,1):
+    # if size == (256,256,1):
         
-        img = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
+    #     img = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
         
-        grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
-        img = grayscale_transform(torch.from_numpy(np.array(img)).float())
-        img = torch.from_numpy(np.array(img)).float().squeeze(0)
+    #     grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
+    #     img = grayscale_transform(torch.from_numpy(np.array(img)).float())
+    #     img = torch.from_numpy(np.array(img)).float().squeeze(0)
     
     axarr[0].imshow((img*255).detach().numpy().reshape(size[0],size[1],size[2]))
     axarr[0].set_title('Image')

@@ -1,21 +1,17 @@
 # from dataLoader import dataLoader
 # from evaluation import evaluator
 #from objectDetection import visDrone
-
-
-
-from saliencyDetection import saliency
 import time
-# saliency.trainHorus(12)
-
-
 import argparse
-from tester import tests
 import logging.config
 import yaml
 
 
-def arguments_parser(args:argparse.Namespace):
+def arguments_parser(args:argparse.Namespace) -> None:
+    assert not (args.build and args.test), f"Only one argument allowed!"
+    if args.build and (args.build != "build" and args.build != "test"):
+        raise ValueError(f"Unrecognized argument '{args.build}'")
+
     if not args.config:
         args.config = "config/conf.yaml"
     conf = getConfigYAML(args.config)
@@ -24,16 +20,23 @@ def arguments_parser(args:argparse.Namespace):
 
     main(args,conf,logger)
 
-    
 
 def main(args:argparse.Namespace,conf:any,logger:logging.Logger) -> None:
+    if args.version:
+        print("Horus Version: %s" % conf["version"])
+        return
+    
+    from saliencyDetection import saliency
+    from tester import tests
+    
     start_time = time.time()
+    
     try:
-        if args.build:
+        if args.build == "build":
             saliency.trainHorus(conf["saliencyDetection"],verbose=args.verbose)
 
-        elif args.test:
-            tests.unitTestCollider()
+        elif args.build == "test":
+            tests.horus()
         logger.info(f"Total Time: %.2f s" % (time.time()-start_time))
 
     except Exception as e:
@@ -67,13 +70,14 @@ def getLogger(name:str) -> logging.Logger:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-                    prog='Horus Saliency Detection & Decision Maker',
-                    description='This program builds and uses the "Horus" neural network',
+                    prog='horus.py [argument]',
+                    description='Horus Saliency Detection & Decision Maker.\n',
                     epilog='For more information do not hesitate to contact the developer on github or other platforms :)')
     
-    parser.add_argument('-b','--build',action='store_true',help="Build the Horus Neural Network")
-    parser.add_argument('-t','--test',action='store_true',help="Tester")
-    parser.add_argument('-c','--config',action='store',type=str,metavar='f',help="YAML config file name")
-    parser.add_argument('-v','--verbose',action='store',choices=["developer","staging","production"],help="Logger settings")
+    parser.add_argument('build',nargs='?',help="Build the Horus Neural Network")
+    parser.add_argument('test',nargs='?',help="Tester")
+    parser.add_argument('-c','--config',action='store',type=str,metavar='file',help="YAML config file name")
+    parser.add_argument('--verbose',action='store',choices=["developer","staging","production"],help="Logger settings")
+    parser.add_argument('-v','--version',action='store_true',help="Return Horus Version")
     args = parser.parse_args()
     arguments_parser(args)

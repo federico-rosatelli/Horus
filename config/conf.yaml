@@ -8,8 +8,9 @@ saliencyDetection:
             Model:            horus_model.pt
 
       training:
-            epochs:           120
-            batch_size:       100
+            epochs:           12
+            batch_size:       8
+            batch_saving:      5
 
             teacher:
                   learning_rate:    0.0001
