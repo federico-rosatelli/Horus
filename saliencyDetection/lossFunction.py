@@ -34,10 +34,11 @@ def Loss(spatial_result,temporal_result) -> float:
 
     L2 =  U*slT + (1-U)*hlT
 
-    return (
-            (L1**2)+
-            (L2**2)
-        )/2
+    return (L1 + L2) / 2
+    # return (
+    #         (L1**2)+
+    #         (L2**2)
+    #     )/2
     # s = U*sls + (1-U)*hls
     # t = U*slt + (1-U)*hlt
     # return math.sqrt(s**2 + t**2)

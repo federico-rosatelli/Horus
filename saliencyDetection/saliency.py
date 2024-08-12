@@ -275,8 +275,9 @@ def trainHorus(conf:any,verbose:str|None=None):
             optimizerT.step()
             optimizerS.step()
 
-            loss = math.sqrt(loss.item())
-
+            #loss = math.sqrt(loss.item())
+            loss = loss.item()
+            
             batch_history.append(loss)
 
             if batch % batch_saving == 0 and batch != 0:

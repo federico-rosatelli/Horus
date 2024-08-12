@@ -31,21 +31,21 @@ def main(args:argparse.Namespace,conf:any,logger:logging.Logger) -> None:
     
     start_time = time.time()
     
-    try:
-        if args.build == "build":
-            saliency.trainHorus(conf["saliencyDetection"],verbose=args.verbose)
+    #try:
+    if args.build == "build":
+        saliency.trainHorus(conf["saliencyDetection"],verbose=args.verbose)
 
-        elif args.build == "test":
-            tests.horus()
-        logger.info(f"Total Time: %.2f s" % (time.time()-start_time))
+    elif args.build == "test":
+        tests.horus()
+    logger.info(f"Total Time: %.2f s" % (time.time()-start_time))
 
-    except Exception as e:
-        logger.fatal(f"{e.__class__.__name__}: {' | '.join(e.args)} - Total Time: %.2f s" % (time.time()-start_time))
-        return
+    # except Exception as e:
+    #     logger.fatal(f"{e.__class__.__name__}: {' | '.join(e.args)} - Total Time: %.2f s" % (time.time()-start_time))
+    #     return
     
-    except KeyboardInterrupt:
-        logger.fatal(f"Interrupt by User - Total Time: %.2f s" % (time.time()-start_time))
-        return
+    # except KeyboardInterrupt:
+    #     logger.fatal(f"Interrupt by User - Total Time: %.2f s" % (time.time()-start_time))
+    #     return
     
     
     
