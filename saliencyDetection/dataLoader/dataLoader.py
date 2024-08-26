@@ -1,12 +1,18 @@
+"""
+Custom Datasets for Horus Neural Network.
+
+Each class is based on AVS1K Dataset.
+
+This module implements :class:`DataLoader` from :module:`torch` module
+"""
 from glob import glob
-from matplotlib import pyplot as plt
 from PIL import Image
-import random
 from torchvision.transforms.functional import pil_to_tensor
 from torch.utils.data import DataLoader
 
 
 class AVS1KDataSetTeacher:
+    size:tuple[int,int] = (1280,720)
     def __init__(self,rootDir,subDir) -> None:
         video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
         video_Ground_List = sorted(glob(f"{rootDir}/{subDir}/Ground/*"))
@@ -18,29 +24,57 @@ class AVS1KDataSetTeacher:
         self.all_Video_Ground = []
         for ground in video_Ground_List:
             self.all_Video_Ground += sorted(glob(f"{ground}/*"))
-    
+
     def __len__(self):
         return len(self.all_Video_Frame)
     
     def __getitem__(self,i):
-        videoPath = self.all_Video_Frame[i]
-        groundPath = self.all_Video_Ground[i]
+        spatialFramePath = self.all_Video_Frame[i]
+        spatialGroundPath = self.all_Video_Ground[i]
+        if i == len(self.all_Video_Frame)-1:
+            temporalFramePath = self.all_Video_Frame[i]
+            temporalGroundPath = self.all_Video_Ground[i]
+        else:
+            temporalFramePath = self.all_Video_Frame[i+1] if (
+                                self.all_Video_Frame[i+1].split("/")[-2] == spatialFramePath.split("/")[-2]
+                                ) else self.all_Video_Frame[i]
+            temporalGroundPath = self.all_Video_Ground[i+1] if (
+                                self.all_Video_Ground[i+1].split("/")[-2] == spatialGroundPath.split("/")[-2]
+                                ) else self.all_Video_Ground[i]
+
+        #open spatial/temporal Frame and Ground
+        imgSpatialFrame = Image.open(spatialFramePath)
+        imgTemporalFrame = Image.open(temporalFramePath)
         
-        imgFrame = Image.open(videoPath)
-        imgGround = Image.open(groundPath)
+        imgSpatialGround = Image.open(spatialGroundPath)
+        imgTemporalGround = Image.open(temporalGroundPath)
 
-        imgFrame = imgFrame.resize((720,1280))
-        imgGround = imgGround.resize((720,1280))
+        #resize spatial/temporal Frame and Ground
+        imgSpatialFrame = imgSpatialFrame.resize(self.size)
+        imgTemporalFrame = imgTemporalFrame.resize(self.size)
+        
+        imgSpatialGround = imgSpatialGround.resize(self.size)
+        imgTemporalGround = imgTemporalGround.resize(self.size)
 
-        imgFrame = pil_to_tensor(imgFrame)
-        imgGround = pil_to_tensor(imgGround)
+        #from PIL to Tensor spatial/temporal Frame and Ground
+        imgSpatialFrame = pil_to_tensor(imgSpatialFrame)
+        imgTemporalFrame = pil_to_tensor(imgTemporalFrame)
+        
+        imgSpatialGround = pil_to_tensor(imgSpatialGround)
+        imgTemporalGround = pil_to_tensor(imgTemporalGround)
 
-        imgFrame = imgFrame.permute(2, 0, 1)
-        imgGround = imgGround.permute(2, 0, 1)
+        #permute spatial/temporal Frame and Ground
+        imgSpatialFrame = imgSpatialFrame.permute(1, 0, 2)
+        imgTemporalFrame = imgTemporalFrame.permute(1, 0, 2)
 
-        return imgFrame/255,imgGround/255
+        imgSpatialGround = imgSpatialGround.permute(1, 0, 2)
+        imgTemporalGround = imgTemporalGround.permute(1, 0, 2)
+
+        return (imgSpatialFrame/255,imgTemporalFrame/255),(imgSpatialGround/255,imgTemporalGround/255)
 
 class AVS1KDataSet:
+    sizeT:tuple[int,int] = (1280,720)
+    sizeS:tuple[int,int] = (256,256)
 
     def __init__(self,rootDir,subDir) -> None:
         video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
@@ -79,17 +113,17 @@ class AVS1KDataSet:
         imgTemporalGround = Image.open(temporalGroundPath)
 
         #resize spatial/temporal Frame and Ground for Teacher & Student
-        imgSpatialFrameTeacher = imgSpatialFrame.resize((720,1280))
-        imgTemporalFrameTeacher = imgTemporalFrame.resize((720,1280))
+        imgSpatialFrameTeacher = imgSpatialFrame.resize(self.sizeT)
+        imgTemporalFrameTeacher = imgTemporalFrame.resize(self.sizeT)
         
-        imgSpatialGroundTeacher = imgSpatialGround.resize((720,1280))
-        imgTemporalGroundTeacher = imgTemporalGround.resize((720,1280))
+        imgSpatialGroundTeacher = imgSpatialGround.resize(self.sizeT)
+        imgTemporalGroundTeacher = imgTemporalGround.resize(self.sizeT)
 
-        imgSpatialFrameStudent = imgSpatialFrame.resize((256,256))
-        imgTemporalFrameStudent = imgTemporalFrame.resize((256,256))
+        imgSpatialFrameStudent = imgSpatialFrame.resize(self.sizeS)
+        imgTemporalFrameStudent = imgTemporalFrame.resize(self.sizeS)
         
-        imgSpatialGroundStudent = imgSpatialGround.resize((256,256))
-        imgTemporalGroundStudent = imgTemporalGround.resize((256,256))
+        imgSpatialGroundStudent = imgSpatialGround.resize(self.sizeS)
+        imgTemporalGroundStudent = imgTemporalGround.resize(self.sizeS)
 
         #from PIL to Tensor spatial/temporal Frame and Ground for Teacher & Student
         imgSpatialFrameTeacher = pil_to_tensor(imgSpatialFrameTeacher)
@@ -105,23 +139,23 @@ class AVS1KDataSet:
         imgTemporalGroundStudent = pil_to_tensor(imgTemporalGroundStudent)
 
         #permute spatial/temporal Frame and Ground for Teacher & Student
-        imgSpatialFrameTeacher = imgSpatialFrameTeacher.permute(2, 0, 1)
-        imgTemporalFrameTeacher = imgTemporalFrameTeacher.permute(2, 0, 1)
+        imgSpatialFrameTeacher = imgSpatialFrameTeacher.permute(1, 0, 2)
+        imgTemporalFrameTeacher = imgTemporalFrameTeacher.permute(1, 0, 2)
 
-        imgSpatialGroundTeacher = imgSpatialGroundTeacher.permute(2, 0, 1)
-        imgTemporalGroundTeacher = imgTemporalGroundTeacher.permute(2, 0, 1)
+        imgSpatialGroundTeacher = imgSpatialGroundTeacher.permute(1, 0, 2)
+        imgTemporalGroundTeacher = imgTemporalGroundTeacher.permute(1, 0, 2)
 
-        imgSpatialFrameStudent = imgSpatialFrameStudent.permute(2, 0, 1)
-        imgTemporalFrameStudent = imgTemporalFrameStudent.permute(2, 0, 1)
+        imgSpatialFrameStudent = imgSpatialFrameStudent.permute(1, 0, 2)
+        imgTemporalFrameStudent = imgTemporalFrameStudent.permute(1, 0, 2)
 
-        imgSpatialGroundStudent = imgSpatialGroundStudent.permute(2, 0, 1)
-        imgTemporalGroundStudent = imgTemporalGroundStudent.permute(2, 0, 1)
+        imgSpatialGroundStudent = imgSpatialGroundStudent.permute(1, 0, 2)
+        imgTemporalGroundStudent = imgTemporalGroundStudent.permute(1, 0, 2)
 
         return (
                 (imgSpatialFrameTeacher/255,imgTemporalFrameTeacher/255),
-                (imgSpatialFrameStudent/255,imgTemporalFrameStudent/25)),(
+                (imgSpatialFrameStudent/255,imgTemporalFrameStudent/255)),(
                 (imgSpatialGroundTeacher/255,imgTemporalGroundTeacher/255),
-                (imgSpatialGroundStudent/255,imgTemporalGroundStudent/25))
+                (imgSpatialGroundStudent/255,imgTemporalGroundStudent/255))
 
 
 
@@ -186,14 +220,6 @@ class AVS1KDataSetStudent:
 
         return (imgSpatialFrame/255,imgTemporalFrame/255),(imgSpatialGround/255,imgTemporalGround/25)
 
-# def newTeacherLoader(rootDir:str, runType:str) ->DataLoader:
-#     if runType.lower() == "test":
-#         subDir = "testSet"
-#     elif runType.lower() == "valid":
-#         subDir = "validSet"
-#     else:
-#         subDir = "trainSet"
-#     return DataLoader(AVS1KDataSetTeacher(rootDir,subDir), shuffle=True)
 
 def newLoader(datasetCLass:any,rootDir:str, runType:str, batch_size:int=64) -> DataLoader:
     if runType.lower() == "test":
@@ -203,36 +229,3 @@ def newLoader(datasetCLass:any,rootDir:str, runType:str, batch_size:int=64) -> D
     else:
         subDir = "trainSet"
     return DataLoader(datasetCLass(rootDir,subDir), shuffle=True,batch_size=batch_size)
-
-
-
-
-class Displayer:
-    def __init__(self,loader:str="2020-TIP-Fu-MMNet",type:str="trainSet",item:int=-1,nframe:int=-1) -> None:
-        self.loader = loader
-        self.type = type
-        length = len(glob(f"{loader}/{type}/Frame/*"))
-        self.item = random.randint(0,length) if item < 0 else item if item < length else length - 1
-        #self.item = self.item if self.item < length else length - 1
-        self.dataloader = AVS1KDataSet(loader,type)
-        self.image,self.label = self.dataloader.__getitem__(self.item)
-        self.nframe = random.randint(0,len(self.image)) if nframe < 0 else nframe if nframe < len(self.image) else len(self.image)-1
-        #self.nframe = self.nframe if self.nframe < len(self.image) else len(self.image)-1
-
-
-    def show(self)->None:
-        fig, axarr = plt.subplots(1,2)
-        axarr[0].imshow(self.image[self.nframe].permute(2,0,1))
-        axarr[0].set_title('Image')
-        axarr[0].axis('off')
-
-        axarr[1].imshow(self.label[self.nframe].permute(2,0,1))
-        axarr[1].set_title('Label')
-        axarr[1].axis('off')
-
-        fig.suptitle(f'Image & Label of {self.type}/{self.item} on Frame:{self.nframe}', fontsize=10)
-        plt.tight_layout()
-        plt.show()
-    
-    def print(self) -> None:
-        print()

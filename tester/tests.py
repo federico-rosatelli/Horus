@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import wrapper.collisions as collisions
-from saliencyDetection.saliency import Horus
-from saliencyDetection.dataLoader.dataLoader import AVS1KDataSet
+from saliencyDetection.saliency import Horus,HorusModelTeacher
+from saliencyDetection.dataLoader.dataLoader import AVS1KDataSet,AVS1KDataSetTeacher
 from torch.utils.data import DataLoader
 
 
@@ -13,37 +13,39 @@ def unitTestCollider():
 
 
 def horus():
-    h = Horus(model_file="horus_model.pt",state_dict=True)
-    d = DataLoader(AVS1KDataSet("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=8)
-    for _,(imgs,_) in enumerate(d):
-        print(len(imgs))
+    h = Horus(HorusModelTeacher,model_file="horus_model_teacher_spatial.pt",state_dict=True)
+    d = DataLoader(AVS1KDataSetTeacher("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=16)
+    for _,(imgs,labels) in enumerate(d):
+
         _,img = imgs
+        _,label = labels
         
         pred = h.predict(img[0])
-        show(img[0][0],pred[0],"test_predict.png")
+        
+        show(img[0],pred,label[0],"test_predict.png")
         break
 
 
-def show(img,pred,file_name,size=(256,256,1))->None:
+def show(img,pred,label,file_name)->None:
     
     
-    fig, axarr = plt.subplots(1,1)
-    # if size == (256,256,1):
-        
-    #     img = (img*255).detach().cpu().numpy().transpose(0, 2, 1, 3)
-        
-    #     grayscale_transform = transforms.Grayscale(num_output_channels=1)  # Specify 1 channel for grayscale
-    #     img = grayscale_transform(torch.from_numpy(np.array(img)).float())
-    #     img = torch.from_numpy(np.array(img)).float().squeeze(0)
-    img = img.detach().numpy().transpose(1,0,2)
+    fig, axarr = plt.subplots(1,3)
     
-    # axarr[0].imshow((img*255))
-    # axarr[0].set_title('Image')
-    # axarr[0].axis('off')
-    pred = pred.reshape(256, 256)
-    axarr.imshow((pred*255))
-    axarr.set_title('Predict')
-    axarr.axis('off')
+    img = img.detach().numpy().transpose(0,2,1)
+    pred = pred.detach().cpu().numpy().transpose(0,2,1)
+    label = label.detach().numpy().transpose(0,2,1)
+
+    axarr[0].imshow((img))
+    axarr[0].set_title('Image')
+    axarr[0].axis('off')
+
+    axarr[1].imshow((pred*255))
+    axarr[1].set_title('Predict')
+    axarr[1].axis('off')
+
+    axarr[2].imshow((label))
+    axarr[2].set_title('Label')
+    axarr[2].axis('off')
 
     
     plt.tight_layout()

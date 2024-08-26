@@ -15,26 +15,26 @@ class HorusLossFunction(nn.Module):
         return Loss(s_res,t_res)
 
 
-def Loss(spatial_result,temporal_result) -> float:
-    teacher_s_result,student_s_result,ground_s_map = spatial_result
-    teacher_s_resize = np.resize(teacher_s_result.detach().numpy(),(256,256))
-    ground_s_resize = np.resize(ground_s_map.detach().numpy(),(256,256))
+def Loss(student_predict,teacher_predict,ground_teacher) -> float:
+    #teacher_s_result,student_s_result,ground_s_map = spatial_result
+    teacher_s_resize = np.resize(teacher_predict.detach().numpy(),(256,256))
+    ground_s_resize = np.resize(ground_teacher.detach().numpy(),(256,256))
     
-    slS = SHLoss(student_s_result,torch.from_numpy(teacher_s_resize))               # soft loss (student_pred_spt, teacher_pred_spt)
-    hlS = SHLoss(student_s_result,torch.from_numpy(ground_s_resize))                # hard loss (student_pred_stp, teacher_ground_spt)
-
+    slS = SHLoss(student_predict,torch.from_numpy(teacher_s_resize))               # soft loss (student_pred_spt, teacher_pred_spt)
+    hlS = SHLoss(student_predict,torch.from_numpy(ground_s_resize))                # hard loss (student_pred_stp, teacher_ground_spt)
+    # [1,256,1,256]
     L1 =  U*slS + (1-U)*hlS
 
-    teacher_t_result,student_t_result,ground_t_map = temporal_result
-    teacher_t_resize = np.resize(teacher_t_result.detach().numpy(),(256,256))
-    ground_t_resize = np.resize(ground_t_map.detach().numpy(),(256,256))
-    
-    slT = SHLoss(student_t_result,torch.from_numpy(teacher_t_resize))               # soft loss (student_pred_tem, teacher_pred_tem)
-    hlT = SHLoss(student_t_result,torch.from_numpy(ground_t_resize))                # hard loss (student_pred_tem, teacher_ground_tem)
+    # teacher_t_result,student_t_result,ground_t_map = temporal_result
+    # teacher_t_resize = np.resize(teacher_t_result.detach().numpy(),(256,256))
+    # ground_t_resize = np.resize(ground_t_map.detach().numpy(),(256,256))
+    # # [2,256,1,256]
+    # slT = SHLoss(student_t_result,torch.from_numpy(teacher_t_resize))               # soft loss (student_pred_tem, teacher_pred_tem)
+    # hlT = SHLoss(student_t_result,torch.from_numpy(ground_t_resize))                # hard loss (student_pred_tem, teacher_ground_tem)
 
-    L2 =  U*slT + (1-U)*hlT
+    # L2 =  U*slT + (1-U)*hlT
 
-    return (L1 + L2) / 2
+    return L1
     # return (
     #         (L1**2)+
     #         (L2**2)
@@ -45,13 +45,13 @@ def Loss(spatial_result,temporal_result) -> float:
 
 
 
-def SHLoss(student_result:torch.Tensor,teacher_result:torch.Tensor) -> float:
+def SHLoss(student_result:torch.Tensor,teacher_ground_result:torch.Tensor) -> float:
     """
     Soft & Hard Loss
     >>> 1/(w*h) * norm((s-t),2)
     """
     w,h = 256,256
-    diff = student_result - teacher_result
+    diff = student_result - teacher_ground_result
     norm = torch.norm(diff, p=2)
     return (
         1/(h * w)

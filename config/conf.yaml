@@ -3,21 +3,32 @@ version: 0.01a
 
 saliencyDetection:
 
-      files:
-            LossHistory:      loss_history.json
-            Model:            horus_model.pt
-
-      training:
-            epochs:           12
-            batch_size:       8
-            batch_saving:      5
-
-            teacher:
+      teacher:
+            training:
+                  epochs:           12
+                  batch_size:       16
+                  batch_saving:     10
                   learning_rate:    0.0001
-                  
+
+                  files:
+                        LossHistorySpatial:     loss_history_teacher_spatial.json
+                        LossHistoryTemporal:    loss_history_teacher_temporal.json
+                        ModelSpatial:           horus_model_teacher_spatial.pt
+                        ModelTemporal:          horus_model_teacher_temporal.pt
       
-            student:
+      student:
+            training:
+                  epochs:           12
+                  batch_size:       8
+                  batch_saving:     5
                   learning_rate:    0.0001
+
+                  files:
+                        LossHistorySpatial:     loss_history_student_spatial.json
+                        LossHistoryTemporal:    loss_history_student_temporal.json
+                        ModelSpatial:           horus_model_student_spatial.pt
+                        ModelTemporal:          horus_model_student_temporal.pt
+
                         
 
 
