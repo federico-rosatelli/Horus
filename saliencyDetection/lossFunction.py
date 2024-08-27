@@ -11,8 +11,8 @@ class HorusLossFunction(nn.Module):
     Custom Loss Function implementing Soft & Hard Loss
     """
     @staticmethod
-    def forward(s_res, t_res):    
-        return Loss(s_res,t_res)
+    def forward(s_res, t_res, g_lab):    
+        return Loss(s_res, t_res, g_lab)
 
 
 def Loss(student_predict,teacher_predict,ground_teacher) -> float:
@@ -25,23 +25,7 @@ def Loss(student_predict,teacher_predict,ground_teacher) -> float:
     # [1,256,1,256]
     L1 =  U*slS + (1-U)*hlS
 
-    # teacher_t_result,student_t_result,ground_t_map = temporal_result
-    # teacher_t_resize = np.resize(teacher_t_result.detach().numpy(),(256,256))
-    # ground_t_resize = np.resize(ground_t_map.detach().numpy(),(256,256))
-    # # [2,256,1,256]
-    # slT = SHLoss(student_t_result,torch.from_numpy(teacher_t_resize))               # soft loss (student_pred_tem, teacher_pred_tem)
-    # hlT = SHLoss(student_t_result,torch.from_numpy(ground_t_resize))                # hard loss (student_pred_tem, teacher_ground_tem)
-
-    # L2 =  U*slT + (1-U)*hlT
-
     return L1
-    # return (
-    #         (L1**2)+
-    #         (L2**2)
-    #     )/2
-    # s = U*sls + (1-U)*hls
-    # t = U*slt + (1-U)*hlt
-    # return math.sqrt(s**2 + t**2)
 
 
 

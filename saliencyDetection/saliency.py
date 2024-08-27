@@ -21,6 +21,9 @@ import torch.nn.functional as F
 
 
 class HorusModelTeacher(nn.Module):
+    """
+    Horus Teacher CNN Model.
+    """
     def __init__(self):
         super(HorusModelTeacher,self).__init__()
 
@@ -35,7 +38,6 @@ class HorusModelTeacher(nn.Module):
             nn.ReLU()
         )
         
-        # Decoder
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(1024, 512, kernel_size=1, stride=2),
             nn.ReLU(),
@@ -57,32 +59,12 @@ class HorusModelTeacher(nn.Module):
 
 
 
-class HorusModel(nn.Module):
+class HorusModelStudent(nn.Module):
+    """
+    Horus Student CNN Model.
+    """
     def __init__(self):
-        super(HorusModel, self).__init__()
-
-        
-        # Define the layers for your model
-        # self.conv16 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
-        # self.conv256_16 = nn.Conv2d(256, 16, kernel_size=3, stride=1, padding=1)
-        # self.relu = nn.ReLU()
-        
-        # self.max16  = nn.MaxPool2d(1,2)
-        # self.max32  = nn.MaxPool2d(2,2)
-
-        # self.conv32 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)
-
-
-        # self.conv64 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
-        # self.conv64_64 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
-
-        # self.conv128 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
-
-        # self.conv256 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
-
-        # self.convP = nn.Conv2d(1,1,kernel_size=3,stride=1,padding=1)
-        # self.max256  = nn.MaxPool2d((1,2),(1,2))
-
+        super(HorusModelStudent, self).__init__()
     
         self.encoder = nn.Sequential(
             nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
@@ -93,71 +75,36 @@ class HorusModel(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU()
         )
 
         self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, kernel_size=1, stride=2),
+            nn.ReLU(),
             nn.ConvTranspose2d(64, 32, kernel_size=1, stride=2),
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 16, kernel_size=1, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(16, 64, kernel_size=3, padding=1),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.Conv2d(128, 256, kernel_size=3, padding=1)
         )
 
-        
 
-
-    def forward(self, x, xt=None):
-        # if x1:
-        #     self.conv16 = nn.Conv2d(256, 256, kernel_size=6, stride=1, padding=1)
-
-        # x = self.conv16(x)
-        # x = self.relu(x)
-        # x = self.conv256_16(x)
-        
-
-        
-        # x = self.max16(x)
-
-        
-
-        # x = self.conv32(x)
-
-
-        # x = self.max32(x)
-
-
-        # x = self.conv64(x)
-        # x = self.relu(x)
-        # x = self.conv64_64(x)
-        # x = self.relu(x)
-        # x = self.conv128(x)
-        # x = self.relu(x)
-        # #print(x.shape)
-        # x = self.conv256(x)
-        # #print(x.shape)
-        # x = self.relu(x)
-
-        # return x
+    def forward(self, x, spatiotemporal=False):
         
         x = self.encoder(x)
-        x = self.decoder(x)
-        padding = (0, 3)
-        x = F.pad(x, padding, mode='constant', value=0)
+        if not spatiotemporal:
+            x = self.decoder(x)
+            padding = (0, 3)
+            x = F.pad(x, padding, mode='constant', value=0)
         return x
 
 
-        
-
-
-# Lsp = u * Ls * ()
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# model = Horus()
-# model.to(device)
     
 class Horus:
     """
@@ -192,11 +139,6 @@ class Horus:
             img: any image type (`PIL`, `np.array` ...)
         """
 
-        # img = Image.open(img)
-        # img = img.resize((256,256))
-        # img = pil_to_tensor(img)
-        # img = img.permute(2, 0, 1)
-        # img = img.to(self.device)
         pred = self.model(img)
         return pred
 
@@ -219,17 +161,17 @@ def trainHorusNetwork(conf:any,verbose:str|None=None) -> None:
     teacherConf = conf["teacher"]["training"]
     studentConf = conf
     
-    pathTeacher = Path(f'{DIR}/models/{teacherConf["files"]["ModelSpatial"]}')
-    if not pathTeacher.exists():
+    pathTeacher = Path(f'{DIR}/models/{teacherConf["files"]["ModelSpatial"]}')  #teacher model
+    if not pathTeacher.exists():                                                #skip if model exists
 
         # Spatial/Temporal Teacher Training
         trainHorusTeacher(teacherConf,dtL.AVS1KDataSetTeacher,HorusModelTeacher,verbose)
 
-    pathStudent = Path(f'{DIR}/models/{studentConf["files"]["ModelSpatial"]}')
-    if not pathStudent.exists():
+    pathStudent = Path(f'{DIR}/models/{studentConf["files"]["ModelSpatial"]}')  #student model
+    if not pathStudent.exists():                                                #skip if model exists
 
         # Spatial/Temporal Student Training
-        trainHorusStudent(studentConf,dtL.AVS1KDataSet,HorusModel,verbose=verbose)
+        trainHorusStudent(studentConf,dtL.AVS1KDataSet,HorusModelStudent,verbose=verbose)
     
     #TODO Spatial Temporal Model Training (???)
 
@@ -399,14 +341,14 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,verbose:str|None=None)
     return
 
 
-def trainHorusStudent(conf:any,datasetCLass:any,model:any,verbose:str|None=None) -> None:
+def trainHorusStudent(conf:any,datasetClass:any,model:any,verbose:str|None=None) -> None:
     """
     Training of Horus Student Model.\n
     Spatial & Temporal Knowledge implemented.
 
     Args:
         conf: a configuration dictionary from config path.
-        datasetClass: Horus DataLoader class from :file:`dataLoader` module.
+        datasetClass: Horus DataLoader class from :module:`saliencyDetection.dataLoader.dataLoader` module.
         model: Horus Model Class.
         verbose: a string for :class:`logging` module to return a logger with the specified name.
     """
@@ -419,8 +361,8 @@ def trainHorusStudent(conf:any,datasetCLass:any,model:any,verbose:str|None=None)
     if verbose:
         logger = logging.getLogger(verbose)
     
-    teacherModelS = Horus(models["ModelSpatial"],state_dict=True)       #teacher spatial model already trained
-    teacherModelT = Horus(models["ModelTemporal"],state_dict=True)      #teacher temporal model already trained
+    teacherModelS = Horus(HorusModelTeacher,models["ModelSpatial"],state_dict=True)       #teacher spatial model already trained
+    teacherModelT = Horus(HorusModelTeacher,models["ModelTemporal"],state_dict=True)      #teacher temporal model already trained
 
     epochs = int(conf["epochs"])
     if epochs < 0 or epochs > 4096:
@@ -434,7 +376,7 @@ def trainHorusStudent(conf:any,datasetCLass:any,model:any,verbose:str|None=None)
     if batch_saving < 0:
         raise ValueError(f"Value for batch_saving must be > 0. Got: {batch_saving}")
     
-    train = dtL.newLoader(datasetCLass,ROOT_DIR,TRAIN_SET,batch_size)
+    train = dtL.newLoader(datasetClass,ROOT_DIR,TRAIN_SET,batch_size)
     
     device = torch.device("cpu")
     
@@ -582,9 +524,41 @@ def trainHorusStudent(conf:any,datasetCLass:any,model:any,verbose:str|None=None)
     with open(f"{DIR}/json/{files['LossHistoryTemporal']}","w") as jswr:    #save temporal loss history in json file
         json.dump(history_dictT,jswr)
 
-
+    # TO spatiotemporalTraining
     return
 
 
-###TODO spatial temporal training and model (??????)
+###TODO spatiotemporal training and model (??????)
+#random normal distribution
+def random_normal_fusion(img1, img2) -> any:
+  
+    weights = torch.randn_like(img1)
+    weights = torch.clamp(weights, 0, 1)
+
+    weights /= weights.sum(dim=1, keepdim=True)
+
+    fused_img = (weights * img1) + ((1 - weights) * img2)
+
+    return fused_img
+
+
+class HorusSpatioTemporalModel:
+    def __init__(self,classModelSpatial,classModelTemporal) -> None:
+        self.spatial = classModelSpatial
+        self.temporal = classModelTemporal
+        # qui vanno messi i layers
+    
+    def forward(self,x_s,x_t):
+
+        x_s = self.spatial(x_s)
+        x_t = self.temporal(x_t)
+
+        x = random_normal_fusion(x_s,x_t)
+
+        # layers della cnn
+
+        return x
+
+
+
 

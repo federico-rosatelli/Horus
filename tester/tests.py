@@ -17,8 +17,8 @@ def horus():
     d = DataLoader(AVS1KDataSetTeacher("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=16)
     for _,(imgs,labels) in enumerate(d):
 
-        _,img = imgs
-        _,label = labels
+        img,_ = imgs
+        label,_ = labels
         
         pred = h.predict(img[0])
         
