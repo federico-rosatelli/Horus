@@ -28,6 +28,15 @@ def Loss(student_predict,teacher_predict,ground_teacher) -> float:
     return L1
 
 
+class HorusSpatioTemporalLoss(nn.Module):
+    """
+    Custom Loss Function implementing SpatioTemporal Hard Loss
+    """
+
+    @staticmethod
+    def forward(sp_res, g_lab):
+        return SHLoss(sp_res,g_lab)
+
 
 def SHLoss(student_result:torch.Tensor,teacher_ground_result:torch.Tensor) -> float:
     """
@@ -36,7 +45,10 @@ def SHLoss(student_result:torch.Tensor,teacher_ground_result:torch.Tensor) -> fl
     """
     w,h = 256,256
     diff = student_result - teacher_ground_result
-    norm = torch.norm(diff, p=2)
+    norm = torch.norm(diff, p="fro")    # Frobenius norm produces the same result as `p=2` in all cases
+                                        # except when `dim` is a list of three or more dims, in which
+                                        # case Frobenius norm throws an error.
+
     return (
         1/(h * w)
     ) * norm    # !!!!.item()

@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import wrapper.collisions as collisions
-from saliencyDetection.saliency import Horus,HorusModelTeacher
-from saliencyDetection.dataLoader.dataLoader import AVS1KDataSet,AVS1KDataSetTeacher
+from saliencyDetection.saliency import Horus,HorusModelTeacher, HorusModelStudent
+from saliencyDetection.dataLoader.dataLoader import AVS1KDataSet,AVS1KDataSetTeacher,AVS1KDataSetStudent
 from torch.utils.data import DataLoader
 
 
@@ -13,8 +13,8 @@ def unitTestCollider():
 
 
 def horus():
-    h = Horus(HorusModelTeacher,model_file="horus_model_teacher_spatial.pt",state_dict=True)
-    d = DataLoader(AVS1KDataSetTeacher("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=16)
+    h = Horus(HorusModelStudent,model_file="horus_model_student_spatial.pt",state_dict=True)
+    d = DataLoader(AVS1KDataSetStudent("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=16)
     for _,(imgs,labels) in enumerate(d):
 
         img,_ = imgs
@@ -22,7 +22,7 @@ def horus():
         
         pred = h.predict(img[0])
         
-        show(img[0],pred,label[0],"test_predict.png")
+        show(img[0],pred,label[0],"test_predict_student.png")
         break
 
 

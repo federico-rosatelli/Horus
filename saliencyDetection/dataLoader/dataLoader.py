@@ -212,11 +212,11 @@ class AVS1KDataSetStudent:
         imgTemporalGround = pil_to_tensor(imgTemporalGround)
 
         #permute spatial/temporal Frame and Ground
-        imgSpatialFrame = imgSpatialFrame.permute(2, 0, 1)
-        imgTemporalFrame = imgTemporalFrame.permute(2, 0, 1)
+        imgSpatialFrame = imgSpatialFrame.permute(1, 0, 2)
+        imgTemporalFrame = imgTemporalFrame.permute(1, 0, 2)
 
-        imgSpatialGround = imgSpatialGround.permute(2, 0, 1)
-        imgTemporalGround = imgTemporalGround.permute(2, 0, 1)
+        imgSpatialGround = imgSpatialGround.permute(1, 0, 2)
+        imgTemporalGround = imgTemporalGround.permute(1, 0, 2)
 
         return (imgSpatialFrame/255,imgTemporalFrame/255),(imgSpatialGround/255,imgTemporalGround/25)
 

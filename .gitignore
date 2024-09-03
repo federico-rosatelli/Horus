@@ -11,5 +11,4 @@ tester/__pycache__/*
 *.mp4
 *.log
 testss/*
-!logs/horus.log
 !public/images/*.png
