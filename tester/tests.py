@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import wrapper.collisions as collisions
-from saliencyDetection.saliency import Horus,HorusModelTeacher, HorusModelStudent
-from saliencyDetection.dataLoader.dataLoader import AVS1KDataSet,AVS1KDataSetTeacher,AVS1KDataSetStudent
+from saliencyDetection.modelClasses import Horus,HorusModelTeacherSpatial, HorusModelStudentSpatial
+from saliencyDetection.dataLoader.dataLoader import AVS1KDataSetTeacherSpatial
 from torch.utils.data import DataLoader
 
 
@@ -13,39 +13,41 @@ def unitTestCollider():
 
 
 def horus():
-    h = Horus(HorusModelStudent,model_file="horus_model_student_spatial.pt",state_dict=True)
-    d = DataLoader(AVS1KDataSetStudent("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=16)
+    h = Horus(HorusModelTeacherSpatial,model_file="horus_model_teacher_spatial.pt",state_dict=True)
+    d = DataLoader(AVS1KDataSetTeacherSpatial("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=4)
     for _,(imgs,labels) in enumerate(d):
 
-        img,_ = imgs
-        label,_ = labels
+        img = imgs
+        label = labels
+    
+        pred = h.predict(img)
         
-        pred = h.predict(img[0])
-        
-        show(img[0],pred,label[0],"test_predict_student.png")
+        show(img,pred,label,"test_predict_new_teacher.png")
         break
+
+
 
 
 def show(img,pred,label,file_name)->None:
     
     
-    fig, axarr = plt.subplots(1,3)
-    
-    img = img.detach().numpy().transpose(0,2,1)
-    pred = pred.detach().cpu().numpy().transpose(0,2,1)
-    label = label.detach().numpy().transpose(0,2,1)
+    fig, axarr = plt.subplots(img.size(0),3)
+    for i in range(len(img)):
+        im = img[i].detach().numpy().transpose(1,2,0)
+        pre = pred[i].detach().cpu().numpy().transpose(1,2,0)
+        labe = label[i].detach().numpy().transpose(1,2,0)
 
-    axarr[0].imshow((img))
-    axarr[0].set_title('Image')
-    axarr[0].axis('off')
+        axarr[i][0].imshow((im))
+        axarr[i][0].set_title('Image')
+        axarr[i][0].axis('off')
 
-    axarr[1].imshow((pred*255))
-    axarr[1].set_title('Predict')
-    axarr[1].axis('off')
+        axarr[i][1].imshow(pre*255)
+        axarr[i][1].set_title('Predict')
+        axarr[i][1].axis('off')
 
-    axarr[2].imshow((label))
-    axarr[2].set_title('Label')
-    axarr[2].axis('off')
+        axarr[i][2].imshow((labe))
+        axarr[i][2].set_title('Label')
+        axarr[i][2].axis('off')
 
     
     plt.tight_layout()

@@ -1,14 +1,17 @@
-version: 0.01a
+version: 0.02b
 
 
 saliencyDetection:
 
+      device: cpu
+
       teacher:
             training:
                   epochs:           12
-                  batch_size:       16
+                  batch_size:       8
                   batch_saving:     10
-                  learning_rate:    0.0001
+                  learning_rate:    0.001
+                  loss_class:       CrossEntropyLoss
 
                   files:
                         LossHistorySpatial:     loss_history_teacher_spatial.json

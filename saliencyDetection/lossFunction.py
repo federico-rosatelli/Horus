@@ -2,9 +2,24 @@ import torch
 import torch.nn as nn
 import numpy as np
 import logging
+from torchvision.transforms import Resize
+import inspect
 logging.getLogger("numpy").propagate = False
 
 U = 0.5
+resize = Resize((267,267))
+
+
+
+def getLossFunction(name:str) -> any:
+    
+    for cls_name,obj in inspect.getmembers(nn):
+        if inspect.isclass(obj):
+            if name.lower() == cls_name.lower():
+                return obj
+    
+    return nn.MSELoss
+
 
 class HorusLossFunction(nn.Module):
     """
@@ -15,17 +30,15 @@ class HorusLossFunction(nn.Module):
         return Loss(s_res, t_res, g_lab)
 
 
-def Loss(student_predict,teacher_predict,ground_teacher) -> float:
-    #teacher_s_result,student_s_result,ground_s_map = spatial_result
-    teacher_s_resize = np.resize(teacher_predict.detach().numpy(),(256,256))
-    ground_s_resize = np.resize(ground_teacher.detach().numpy(),(256,256))
-    
-    slS = SHLoss(student_predict,torch.from_numpy(teacher_s_resize))               # soft loss (student_pred_spt, teacher_pred_spt)
-    hlS = SHLoss(student_predict,torch.from_numpy(ground_s_resize))                # hard loss (student_pred_stp, teacher_ground_spt)
-    # [1,256,1,256]
-    L1 =  U*slS + (1-U)*hlS
+def Loss(student_predict,teacher_predict,ground_teacher):
 
-    return L1
+    teacher_resize = resize(teacher_predict)
+    ground_resize = resize(ground_teacher)
+    
+    slS = SHLoss(student_predict,teacher_resize)               # soft loss (student_pred_spt, teacher_pred_spt)
+    hlS = SHLoss(student_predict,ground_resize)                # hard loss (student_pred_stp, teacher_ground_spt)
+    
+    return (U*slS) + ((1-U)*hlS)
 
 
 class HorusSpatioTemporalLoss(nn.Module):
@@ -38,7 +51,7 @@ class HorusSpatioTemporalLoss(nn.Module):
         return SHLoss(sp_res,g_lab)
 
 
-def SHLoss(student_result:torch.Tensor,teacher_ground_result:torch.Tensor) -> float:
+def SHLoss(student_result:torch.Tensor,teacher_ground_result:torch.Tensor):
     """
     Soft & Hard Loss
     >>> 1/(w*h) * norm((s-t),2)

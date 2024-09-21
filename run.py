@@ -1,9 +1,11 @@
 # from dataLoader import dataLoader
 # from evaluation import evaluator
 #from objectDetection import visDrone
+import sys
 import time
 import argparse
 import logging.config
+import traceback
 import yaml
 
 
@@ -39,7 +41,8 @@ def main(args:argparse.Namespace,conf:any,logger:logging.Logger) -> None:
             tests.horus()
 
     except Exception as e:
-        logger.fatal(f"{e.__class__.__name__}: {' | '.join(e.args)} - Total Time: %.2f s" % (time.time()-start_time))
+        print(traceback.format_exc())
+        logger.fatal(f"{e.__class__.__name__}: {' | '.join(map(str, e.args))} - Total Time: %.2f s" % (time.time()-start_time))
         return
     
     except KeyboardInterrupt:
