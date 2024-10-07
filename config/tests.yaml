@@ -1,0 +1,22 @@
+testVersion: 0.1b
+
+
+saliencyDetection:
+
+      controllUnit:           True
+      modelUsages:            True
+      predictionAccuracy:     True
+      trainSetExample:        False
+      validSetExample:        False
+      testSetExample:         True
+      plotDisplayer:          True
+
+
+
+collider:
+      
+      controllUnit:           True
+      collisionTest:          False
+
+
+

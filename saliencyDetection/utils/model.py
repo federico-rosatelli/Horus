@@ -1,3 +1,4 @@
+from pathlib import Path
 from . import *
 import torch
 import os
@@ -66,4 +67,6 @@ class CheckPoint:
     def print(self) -> dict:
         return self._toDict(type(self.epoch),type(self.state_dict),type(self.optimizer),type(self.loss))
     
-
+    def exists(self) -> bool:
+        return Path(self.file_name).exists()
+    

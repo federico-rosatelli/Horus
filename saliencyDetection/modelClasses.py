@@ -38,6 +38,9 @@ class Horus:
     
     def getCheckPoint(self) -> CheckPoint:
         return self.checkpoint
+
+    def getModel(self) -> any:
+        return self.model
     
     def predict(self,img:any) -> any:
         """
