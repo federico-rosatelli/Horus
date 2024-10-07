@@ -8,15 +8,13 @@ saliencyDetection:
       teacher:
             training:
                   epochs:           12
-                  batch_size:       8
+                  batch_size:       16
                   batch_saving:     10
                   learning_rate:    0.001
-                  loss_class:       CrossEntropyLoss
+                  loss_class:       BCELoss
 
                   files:
-                        LossHistorySpatial:     loss_history_teacher_spatial.json
-                        LossHistoryTemporal:    loss_history_teacher_temporal.json
-                        ModelSpatial:           horus_model_teacher_spatial.pt
+                        ModelSpatial:           horus_model_teacher_spatial1.pt
                         ModelTemporal:          horus_model_teacher_temporal.pt
       
       student:
@@ -27,12 +25,9 @@ saliencyDetection:
                   learning_rate:    0.0001
 
                   files:
-                        LossHistorySpatial:           loss_history_student_spatial.json
-                        LossHistoryTemporal:          loss_history_student_temporal.json
                         ModelSpatial:                 horus_model_student_spatial.pt
                         ModelTemporal:                horus_model_student_temporal.pt
 
-                        LossHistorySpatioTemporal:    loss_history_student_spatiotemporal.json
                         ModelSpatioTemporal:          horus_model_student_spatiotemporal.pt
 
                         

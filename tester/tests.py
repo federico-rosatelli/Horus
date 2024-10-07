@@ -3,6 +3,8 @@ import wrapper.collisions as collisions
 from saliencyDetection.modelClasses import Horus,HorusModelTeacherSpatial, HorusModelStudentSpatial
 from saliencyDetection.dataLoader.dataLoader import AVS1KDataSetTeacherSpatial
 from torch.utils.data import DataLoader
+from saliencyDetection.utils.displayer import Printer
+from saliencyDetection.utils import model
 
 
 def unitTestCollider():
@@ -10,11 +12,14 @@ def unitTestCollider():
     assert (len(borders) == 3 and len(objects) == 3), f"Should return 3,3 \nInstead of: {len(borders)},{len(objects)}"
     return
 
-
+def printer():
+    p = Printer("avg_loss_teacher.png")
+    p.fromLogFile("logs/horus.log")
 
 def horus():
-    h = Horus(HorusModelTeacherSpatial,model_file="horus_model_teacher_spatial.pt",state_dict=True)
+    h = Horus(HorusModelTeacherSpatial,model_file="../../horus_model_teacher_spatial1.pt")
     d = DataLoader(AVS1KDataSetTeacherSpatial("2020-TIP-Fu-MMNet","trainSet"), shuffle=True,batch_size=4)
+    p = Printer("test_predict_new_teacher.png")
     for _,(imgs,labels) in enumerate(d):
 
         img = imgs
@@ -22,8 +27,12 @@ def horus():
     
         pred = h.predict(img)
         
-        show(img,pred,label,"test_predict_new_teacher.png")
+        p.save(img,pred,label)
         break
+    p("plot_teacher.png")
+    c = h.getCheckPoint()
+    p.lossChart(c.getLoss())
+    print(c.print())
 
 
 

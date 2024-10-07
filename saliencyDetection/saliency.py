@@ -12,6 +12,7 @@ from saliencyDetection.dataLoader import dataLoader as dtL
 import saliencyDetection.lossFunction as lossFunction
 from saliencyDetection import modelClasses
 from saliencyDetection import training
+from .utils import displayer, model
 from . import *
 import json
 from pathlib import Path
@@ -37,19 +38,36 @@ def trainHorusNetwork(conf:any,verbose:str|None=None) -> None:
     teacherConf = conf["teacher"]["training"]
     studentConf = conf["student"]["training"]
     
-    pathTeacherSpatial = Path(f'{DIR}/models/{teacherConf["files"]["ModelSpatial"]}')
+    pathTeacherSpatial = Path(f'{DIR}/{MODEL_DIR}/{teacherConf["files"]["ModelSpatial"]}')
 
     if not pathTeacherSpatial.exists():                                                     #skip if model exists
-        # Spatial/Temporal Teacher Training
+        # Spatial Teacher Training
         training.trainHorusTeacher(conf,dtL.AVS1KDataSetTeacherSpatial,modelClasses.HorusModelTeacherSpatial,type_run="spatial",verbose=verbose)
         
-    pathTeacherTemporal = Path(f'{DIR}/models/{teacherConf["files"]["ModelTemporal"]}')
+    else:
+        # Get CheckPoint Model and Start from that
+        checkpoint = model.CheckPoint(teacherConf["files"]["ModelSpatial"]).load()
+        if checkpoint.getEpoch() < teacherConf["epochs"]:
+            newConf = checkpoint.exportConf(device=conf["device"],
+                                            dataset_class=dtL.AVS1KDataSetTeacherSpatial,
+                                            model_class=modelClasses.HorusModelTeacherSpatial, 
+                                            epochs=teacherConf["epochs"],
+                                            batch_size=teacherConf["batch_size"],
+                                            learning_rate=teacherConf["learning_rate"],
+                                            loss_function=lossFunction.getLossFunction(teacherConf["loss_function"]),
+                                            batch_saving=teacherConf["batch_saving"])
+            
+            training.trainHorusTeacher_checkpoint(newConf,verbose=verbose)
+            
+    
+    
+    pathTeacherTemporal = Path(f'{DIR}/{MODEL_DIR}/{teacherConf["files"]["ModelTemporal"]}')
     
     if not pathTeacherTemporal.exists():                                                    #skip if model exists
-        # Spatial/Temporal Teacher Training    
+        # Temporal Teacher Training    
         training.trainHorusTeacher(conf,dtL.AVS1KDataSetTeacherTemporal,modelClasses.HorusModelTeacherTemporal,type_run="temporal",verbose=verbose)
 
-    pathStudent = Path(f'{DIR}/models/{studentConf["files"]["ModelSpatial"]}')  #student model
+    pathStudent = Path(f'{DIR}/{MODEL_DIR}/{studentConf["files"]["ModelSpatial"]}')  #student model
     if not pathStudent.exists():                                                #skip if model exists
 
         teacherModelS = modelClasses.Horus(dtL.AVS1KDataSetTeacherSpatial,teacherConf["files"]["ModelSpatial"],state_dict=True,device=conf["device"])

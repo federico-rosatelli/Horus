@@ -38,7 +38,7 @@ def main(args:argparse.Namespace,conf:any,logger:logging.Logger) -> None:
             saliency.trainHorusNetwork(conf["saliencyDetection"],verbose=args.verbose)
 
         elif args.build == "test":
-            tests.horus()
+            tests.printer()
 
     except Exception as e:
         print(traceback.format_exc())

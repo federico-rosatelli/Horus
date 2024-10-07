@@ -1,3 +1,7 @@
+# AUTHOR Federico Rosatelli
+"""
+Train Horus CNN Model
+"""
 import logging
 logging.getLogger("matplotlib").propagate = False
 logging.getLogger("PIL.PngImagePlugin").propagate = False
@@ -5,9 +9,12 @@ logging.getLogger("matplotlib.font_manager").propagate = False
 from matplotlib import pyplot as plt
 from saliencyDetection.dataLoader import dataLoader as dtL
 import saliencyDetection.lossFunction as lossFunction
+from saliencyDetection.utils.model import CheckPoint
+from saliencyDetection.utils.displayer import Printer
 from . import *
 import json
 import torch
+import os
 
 
 def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial",verbose:str|None=None) -> None:
@@ -30,10 +37,8 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
 
     if type_run.lower() == "temporal":
         model_save = files["ModelTemporal"]
-        json_save = files["LossHistoryTemporal"]
     else:
         model_save = files["ModelSpatial"]
-        json_save = files["LossHistorySpatial"]
 
     if verbose:
         logger = logging.getLogger(verbose)
@@ -49,7 +54,10 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
     batch_saving = int(conf["batch_saving"])
     if batch_saving < 0:
         raise ValueError(f"Value for batch_saving must be > 0. Got: {batch_saving}")
-        
+    
+    p = Printer(f"{type_run}_min_pred.png")
+    check = CheckPoint(model_save)
+
     train = dtL.newLoader(datasetCLass,ROOT_DIR,TRAIN_SET,batch_size)
 
     device = torch.device(device)
@@ -65,7 +73,7 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
     
     optimizer = torch.optim.AdamW(model.parameters(),learning_rate)
     
-    epochs_history = []
+    epochs_history = [[] for _ in epochs]
     min_loss = float('inf')
     avg_loss = float('inf')
 
@@ -74,7 +82,7 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
     for k in range(epochs):
         if verbose:
             logger.info(f"TEACHER TRAINING EPOCH {type_run.upper()}: {k+1} of {epochs}")
-        batch_history = []
+        #batch_history = []
         
         for batch,(imgs,labels) in enumerate(train):
 
@@ -85,22 +93,18 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
             
             predict = model(x)
 
-            y_f = y.view(y.size(0),-1)
-            predict_f = predict.view(predict.size(0),-1)
-            
-            
-            loss = loss_fn(predict_f,y_f)#/predict_f.size(1)
+            loss = loss_fn(predict,y)
             loss.backward()
             optimizer.step()
-            loss = loss.item()/predict_f.size(1)
+            loss = loss.item()
             
-            batch_history.append(loss)
+            epochs_history[k].append(loss)
             
-            show(x[:4],predict[:4],y[:4],f"{type_run}_min_pred.png")
+            p.save(x[:4],predict[:4],y[:4])
             if batch % batch_saving == 0 and batch != 0:
 
 
-                latest_batch = batch_history[-batch_saving:]
+                latest_batch = epochs_history[k][-batch_saving:]
                 avg_batch = sum(latest_batch)/batch_saving
                 min_batch = min(latest_batch)
                 max_batch = max(latest_batch)
@@ -111,27 +115,19 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
                 if avg_batch < avg_loss:
                     if verbose:
                         logger.info(f"Saving {type_run.lower().title()} Model...")
-                    torch.save(model.state_dict(), f"{DIR}/models/{model_save}")
+                    check.save(k+1,model,optimizer,epochs_history)
+                    #torch.save(model.state_dict(), f"{DIR}/models/{model_save}")
                     avg_loss = avg_batch
                     
             if loss < min_loss:
                 if verbose:
                     logger.info(f"Saving {type_run.lower().title()} Model for min Loss: {loss}...")
-                torch.save(model.state_dict(), f"{DIR}/models/{model_save}")
+                check.save(k+1,model,optimizer,epochs_history)
+                #torch.save(model.state_dict(), f"{DIR}/models/{model_save}")
                 min_loss = loss
 
-        epochs_history.append(batch_history)
-        batch_history = []
-        
-    history_dict = {}
-
-    for i in range(len(batch_history)):
-        history_dict[i] = batch_history[i]
-        
-    
-    with open(f"{DIR}/json/{json_save}","w") as jswr:
-        json.dump(history_dict,jswr)
-
+        # epochs_history.append(batch_history)
+        # batch_history = []
 
     return
 
@@ -274,38 +270,86 @@ def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_
 
 
 
+def trainHorusTeacher_checkpoint(conf:any,type_run="spatial",verbose:str|None=None):
+
+    device = conf["device"]
+    datasetCLass = conf["dataset_class"]
+    model_class = conf["model_class"]()
+    state_dict = conf["state_dict"]
+    start_epoch = conf["epoch"]-1
+    model_save = conf["file"]
+    optimizer = conf["optimizer"]
+    epochs_history = conf["tot_loss"]
+    epochs = conf["pochs"]
+    batch_size = conf["batch_size"]
+    # learning_rate = conf["learning_rate"]
+    loss_fn = conf["loss_function"]()
+    batch_saving = conf["batch_saving"]
+
+    if verbose:
+        logger = logging.getLogger(verbose)
+
+    if len(epochs_history) < epochs:
+        epochs_history = [[] for _ in epochs]
+    epochs_history[start_epoch] = []
+
+    min_loss = float('inf')#min([min(epo) for epo in epochs_history if epo])
+    avg_loss = float('inf')
+
+    train = dtL.newLoader(datasetCLass,ROOT_DIR,TRAIN_SET,batch_size)
+
+    model = model_class.load_state_dict(state_dict)
+
+    device = torch.device(device)
+
+    model.train()
+
+    p = Printer(f"{type_run}_min_pred.png")
+    check = CheckPoint(model_save)
+
+    for k in range(start_epoch,epochs):
+        if verbose:
+            logger.info(f"TEACHER TRAINING EPOCH {type_run.upper()}: {k+1} of {epochs}")
+        #batch_history = []
+        
+        for batch,(imgs,labels) in enumerate(train):
+
+            x = imgs.to(device)
+            y = labels.to(device)
+
+            optimizer.zero_grad()
+            
+            predict = model(x)
+
+            loss = loss_fn(predict,y)
+            loss.backward()
+            optimizer.step()
+            loss = loss.item()
+            
+            epochs_history[k].append(loss)
+            
+            p.save(x[:4],predict[:4],y[:4])
+            if batch % batch_saving == 0 and batch != 0:
 
 
-def show(img,pred,label,file_name)->None:
-    
-    
-    fig, axarr = plt.subplots(img.size(0),3)
+                latest_batch = epochs_history[k][-batch_saving:]
+                avg_batch = sum(latest_batch)/batch_saving
+                min_batch = min(latest_batch)
+                max_batch = max(latest_batch)
 
-    axarr[0][0].set_title('Image')
-    axarr[0][1].set_title('Predict')
-    axarr[0][2].set_title('Label')
+                if verbose:
+                    logger.info(f"Avg {type_run.lower().title()} Loss Batch {batch}: {avg_batch} ¦ Min Loss: {min_batch} ¦ Max Loss: {max_batch}")
+                    
+                if avg_batch < avg_loss:
+                    if verbose:
+                        logger.info(f"Saving {type_run.lower().title()} Model...")
+                    check.save(k+1,model,optimizer,epochs_history)
+                    avg_loss = avg_batch
+                    
+            if loss < min_loss:
+                if verbose:
+                    logger.info(f"Saving {type_run.lower().title()} Model for min Loss: {loss}...")
+                check.save(k+1,model,optimizer,epochs_history)
+                min_loss = loss
 
-    for i in range(len(img)):
-        im = img[i].detach().numpy().transpose(1,2,0)
-        pre = pred[i].detach().cpu().numpy().transpose(1,2,0)
-        labe = label[i].detach().numpy().transpose(1,2,0)
-
-        axarr[i][0].imshow((im))
-        # axarr[i][0].set_title('Image')
-        axarr[i][0].axis('off')
-
-        axarr[i][1].imshow((pre*255))
-        # axarr[i][1].set_title('Predict')
-        axarr[i][1].axis('off')
-
-        axarr[i][2].imshow((labe))
-        # axarr[i][2].set_title('Label')
-        axarr[i][2].axis('off')
-
-    
-    plt.tight_layout()
-    plt.savefig(f"testss/img/{file_name}")
-    plt.clf()
-    plt.close("all")
-    plt.close(fig)
-    plt.ioff()
+    return

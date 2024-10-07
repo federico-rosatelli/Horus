@@ -4,7 +4,7 @@ logging.getLogger("PIL.PngImagePlugin").propagate = False
 logging.getLogger("matplotlib.font_manager").propagate = False
 from . import *
 import torch.nn as nn
-import torch
+from saliencyDetection.utils.model import CheckPoint
 
 
 class Horus:
@@ -17,21 +17,27 @@ class Horus:
         state_dict: boolean, if the model file is a state dictionary.
         device: string, `cpu`|`cuda` from the config file
     """
-    HOME_PATH:str = f"{DIR}/models/"
+    HOME_PATH:str = f"{DIR}/{MODEL_DIR}/"
     
-    def __init__(self,model_class:any,model_file:str="horus_model.pt",state_dict:bool=True,device:str="cpu") -> None:
+    def __init__(self,model_class:any,model_file:str="horus_model.pt",device:str="cpu") -> None:
         super(Horus,self).__init__()
 
-        model_file = self.HOME_PATH+model_file
 
-        if state_dict:
-            self.model = model_class()
-            self.model.load_state_dict(torch.load(model_file))
-        else:
-            self.model = torch.load(model_file)
+        self.model = model_class()
+
+        self.checkpoint = CheckPoint(model_file).load()
+
+        self.state_dict = self.checkpoint.getStateDict()
         
+        self.model.load_state_dict(self.state_dict)
         self.model.to(device)
         self.model.eval()
+    
+    def getStateDict(self):
+        return self.state_dict
+    
+    def getCheckPoint(self) -> CheckPoint:
+        return self.checkpoint
     
     def predict(self,img:any) -> any:
         """
@@ -53,38 +59,42 @@ class HorusModelTeacherSpatial(nn.Module):
     def __init__(self):
         super(HorusModelTeacherSpatial,self).__init__()
         
+        self.re = nn.ReLU()
+        
         self.encoder = nn.Sequential(
             nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2,stride=2),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2,stride=2),
             nn.ReLU(),
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2,stride=2),
-            nn.ReLU(),
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
             nn.ReLU()
         )
 
         self.decoder = nn.Sequential(
-            nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(256, 64, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
+            # nn.BatchNorm2d(32),
+            # nn.ReLU(),
             nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.ConvTranspose2d(16, 8, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.ReLU(),
             nn.ConvTranspose2d(8, 1, kernel_size=3, stride=2, padding=1, output_padding=1),
-            nn.ReLU()
+            nn.Sigmoid()
+            # nn.ReLU(),
+            # nn.BatchNorm2d(1)
         )
         
     def forward(self, x):
