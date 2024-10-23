@@ -3,19 +3,33 @@ testVersion: 0.1b
 
 saliencyDetection:
 
-      controllUnit:           True
-      modelUsages:            True
-      predictionAccuracy:     True
-      trainSetExample:        False
-      validSetExample:        False
-      testSetExample:         True
-      plotDisplayer:          True
+      controllUnit:     False
+      modelFileTeacher: horus_model_teacher_spatial.pt
+      modelFileStudent: horus_model_student_spatial.pt
+      modelUsages:
+            teacherModel:     False
+            studentModel:     False
+      predictionAccuracy:
+            teacherModel:     False
+            studentModel:     False
+      trainSetExample:
+            teacherModel:     False
+            studentModel:     False
+      validSetExample:
+            teacherModel:     False
+            studentModel:     False
+      testSetExample:
+            teacherModel:     False
+            studentModel:     False
+      plotDisplayer:
+            teacherModel:     True
+            studentModel:     True
 
 
 
 collider:
       
-      controllUnit:           True
+      controllUnit:           False
       collisionTest:          False
 
 

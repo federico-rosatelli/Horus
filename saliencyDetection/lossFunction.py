@@ -7,7 +7,7 @@ import inspect
 logging.getLogger("numpy").propagate = False
 
 U = 0.5
-resize = Resize((267,267))
+resize = Resize((23,39))
 
 
 

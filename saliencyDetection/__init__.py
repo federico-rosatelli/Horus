@@ -7,3 +7,4 @@ VALID_SET = "valid"
 TEST_SET = "set"
 DIR = __name__
 MODEL_DIR = "models"
+TESTER_DIR = "tester"

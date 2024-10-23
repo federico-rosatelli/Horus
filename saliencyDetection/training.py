@@ -6,15 +6,12 @@ import logging
 logging.getLogger("matplotlib").propagate = False
 logging.getLogger("PIL.PngImagePlugin").propagate = False
 logging.getLogger("matplotlib.font_manager").propagate = False
-from matplotlib import pyplot as plt
-from saliencyDetection.dataLoader import dataLoader as dtL
-import saliencyDetection.lossFunction as lossFunction
+from .dataLoader import dataLoader as dtL
+from . import lossFunction
 from saliencyDetection.utils.model import CheckPoint
 from saliencyDetection.utils.displayer import Printer
 from . import *
-import json
 import torch
-import os
 
 
 def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial",verbose:str|None=None) -> None:
@@ -152,10 +149,8 @@ def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_
 
     if type_run.lower() == "temporal":
         model_save = files["ModelTemporal"]
-        json_save = files["LossHistoryTemporal"]
     else:
         model_save = files["ModelSpatial"]
-        json_save = files["LossHistorySpatial"]
     
     if verbose:
         logger = logging.getLogger(verbose)
@@ -173,6 +168,9 @@ def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_
     if batch_saving < 0:
         raise ValueError(f"Value for batch_saving must be > 0. Got: {batch_saving}")
     
+    p = Printer(f"student_{type_run}_min_pred.png")
+    check = CheckPoint(model_save)
+    
     train = dtL.newLoader(datasetClass,ROOT_DIR,TRAIN_SET,batch_size)
     
     device = torch.device(device)
@@ -186,18 +184,18 @@ def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_
 
     optimizer = torch.optim.AdamW(model.parameters(),learning_rate)   #optimizer for model
 
-    epochs_history = []
+    epochs_history = [[] for _ in range(epochs)]
     min_loss = 1
     avg_loss = 1
 
     model.train()
 
     for k in range(epochs):
-        batch_history:list[int] = []
-        batch_history:list[int] = []
 
         if verbose:
             logger.info(f"STUDENT TRAINING EPOCH {type_run.upper()}: {k+1} of {epochs}")
+        
+        check.save(k+1,model,optimizer,epochs_history)
         for batch,(imgs,labels) in enumerate(train):
             
             teacher_x,student_x = imgs
@@ -224,11 +222,13 @@ def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_
 
             loss = loss.item()
 
-            batch_history.append(loss)
+            epochs_history[k].append(loss)
+
+            p.save(student_x[:4],predictS[:4],student_y[:4])
 
             if batch % batch_saving == 0 and batch != 0:
                 
-                latest_batch = batch_history[-batch_saving:]
+                latest_batch =  epochs_history[k][-batch_saving:]
 
                 avg_batch = sum(latest_batch)/batch_saving              #average loss of batch length
                 min_batch = min(latest_batch)                           #min loss of batch length
@@ -240,32 +240,16 @@ def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_
                 if avg_batch < avg_loss:      #if the average loss is less then the minimum average loss
                     if verbose:
                         logger.info(f"Saving {type_run.lower().title()} Model...")
-                    torch.save(model.state_dict(), f"{DIR}/models/{model_save}")    #save the model
+                    check.save(k+1,model,optimizer,epochs_history)    #save the model
                     avg_loss = avg_batch
                 
             
             if loss < min_loss:         #if the loss is less then the minumum loss
                 if verbose:
                     logger.info(f"Saving {type_run.lower().title()} Model for min Loss: {loss}...")
-                torch.save(model.state_dict(), f"{DIR}/models/{model_save}")        #save the model
+                check.save(k+1,model,optimizer,epochs_history)        #save the model
                 min_loss = loss
-
-
-        epochs_history.append(batch_history)
-
-        batch_history = []
     
-    history_dict = {}
-
-    for i in range(len(batch_history)):
-        history_dict[i] = batch_history[i]
-    
-    with open(f"{DIR}/json/{json_save}","w") as jswr:     #save spatial loss history in json file
-        json.dump(history_dict,jswr)
-    
-    with open(f"{DIR}/json/{json_save}","w") as jswr:    #save temporal loss history in json file
-        json.dump(history_dict,jswr)
-
     return model
 
 
@@ -274,20 +258,22 @@ def trainHorusTeacher_checkpoint(conf:any,type_run="spatial",verbose:str|None=No
 
     device = conf["device"]
     datasetCLass = conf["dataset_class"]
-    model_class = conf["model_class"]()
+    model_class = conf["model_class"]
     state_dict = conf["state_dict"]
-    start_epoch = conf["epoch"]-1
+    start_epoch = conf["epoch"]
     model_save = conf["file"]
     optimizer = conf["optimizer"]
     epochs_history = conf["tot_loss"]
-    epochs = conf["pochs"]
+    epochs = conf["epochs"]
     batch_size = conf["batch_size"]
     # learning_rate = conf["learning_rate"]
     loss_fn = conf["loss_function"]()
     batch_saving = conf["batch_saving"]
 
+    print(type(state_dict))
     if verbose:
         logger = logging.getLogger(verbose)
+    logger.info(f"TEACHER TRAINING FROM CHECKPOINT ON EPOCH: {start_epoch}")
 
     if len(epochs_history) < epochs:
         epochs_history = [[] for _ in epochs]
@@ -298,16 +284,17 @@ def trainHorusTeacher_checkpoint(conf:any,type_run="spatial",verbose:str|None=No
 
     train = dtL.newLoader(datasetCLass,ROOT_DIR,TRAIN_SET,batch_size)
 
-    model = model_class.load_state_dict(state_dict)
+    model = model_class().load_state_dict(state_dict)
 
     device = torch.device(device)
+    model = model.to(device)
 
-    model.train()
 
     p = Printer(f"{type_run}_min_pred.png")
     check = CheckPoint(model_save)
 
-    for k in range(start_epoch,epochs):
+    for k in range(start_epoch-1,epochs):
+        check.save(k+1,model,optimizer,epochs_history)
         if verbose:
             logger.info(f"TEACHER TRAINING EPOCH {type_run.upper()}: {k+1} of {epochs}")
         #batch_history = []

@@ -106,10 +106,49 @@ class AVS1KDataSetTeacherTemporal:
 
         return imgTemporalFrame, imgTemporalGround
 
+class AVS1KDataSetStudentSpatialOnly:
+    sizeS:tuple[int,int] = (30,14)
+
+    def __init__(self,rootDir,subDir) -> None:
+        video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
+        video_Ground_List = sorted(glob(f"{rootDir}/{subDir}/Ground/*"))
+
+        self.all_Video_Frame = []
+        for video in video_Frame_List:
+            self.all_Video_Frame += sorted(glob(f"{video}/*"))
+        
+        self.all_Video_Ground = []
+        for ground in video_Ground_List:
+            self.all_Video_Ground += sorted(glob(f"{ground}/*"))
+
+    def __len__(self):
+        return len(self.all_Video_Frame)
+    
+    def __getitem__(self,i):
+        spatialFramePath = self.all_Video_Frame[i]
+        spatialGroundPath = self.all_Video_Ground[i]
+
+        #open spatial Frame and Ground
+        imgSpatialFrame = Image.open(spatialFramePath)
+        imgSpatialGround = Image.open(spatialGroundPath)
+
+        #resize spatial Frame and Ground for Teacher & Student
+
+        imgSpatialFrameStudent = imgSpatialFrame.resize(self.sizeS)
+        imgSpatialGroundStudent = imgSpatialGround.resize(self.sizeS)
+
+        #from PIL to Tensor spatial Frame and Ground for Teacher & Student
+
+        imgSpatialFrameStudent = pil_to_tensor(imgSpatialFrameStudent)/255
+        imgSpatialGroundStudent = pil_to_tensor(imgSpatialGroundStudent)/255
+
+        
+
+        return imgSpatialFrameStudent,imgSpatialGroundStudent
 
 class AVS1KDataSetStudentSpatial:
     sizeT:tuple[int,int] = (980,460)
-    sizeS:tuple[int,int] = (256,256)
+    sizeS:tuple[int,int] = (30,14)
 
     def __init__(self,rootDir,subDir) -> None:
         video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))

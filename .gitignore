@@ -13,3 +13,6 @@ tester/__pycache__/*
 *.out
 testss/*
 !public/images/*.png
+!tester/images/*.png
+!saliencyDetection/models/*.pt
+!logs/*.log
