@@ -3920,3 +3920,6 @@
 2024-10-23 11:50:51.631 - staging - trainHorusStudent - INFO - Avg Spatial Loss Batch 600: 8.909215175663121e-05 ¦ Min Loss: 7.351409294642508e-05 ¦ Max Loss: 0.00010114195174537599
 2024-10-23 11:57:00.774 - staging - trainHorusStudent - INFO - Avg Spatial Loss Batch 610: 8.984172309283167e-05 ¦ Min Loss: 8.023131522350013e-05 ¦ Max Loss: 9.982750634662807e-05
 2024-10-23 12:01:30.558 - staging - trainHorusStudent - INFO - Avg Spatial Loss Batch 620: 9.334843198303134e-05 ¦ Min Loss: 7.532248855568469e-05 ¦ Max Loss: 0.00012365149450488389
+2024-10-23 12:07:04.696 - staging - trainHorusStudent - INFO - Avg Spatial Loss Batch 630: 9.41749254707247e-05 ¦ Min Loss: 8.533164509572089e-05 ¦ Max Loss: 0.00011386688856873661
+2024-10-23 12:10:53.866 - staging - trainHorusStudent - INFO - Avg Spatial Loss Batch 640: 8.928736715461128e-05 ¦ Min Loss: 7.968545833136886e-05 ¦ Max Loss: 0.0001078916757251136
+2024-10-23 12:14:11.008 - staging - trainHorusStudent - INFO - Avg Spatial Loss Batch 650: 8.97618112503551e-05 ¦ Min Loss: 7.7669887105003e-05 ¦ Max Loss: 0.00010223672143183649
