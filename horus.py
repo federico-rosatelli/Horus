@@ -39,7 +39,7 @@ def main(args:argparse.Namespace,conf:any,logger:logging.Logger) -> None:
             tests.testerCommandControll(conf)
         
         elif args.build == "run":
-            saliency.runHorus(conf["saliencyDetection"],"Building_00122.avi")
+            saliency.runHorus(conf["saliencyDetection"],"Human_00192.avi")
             return
 
     except Exception as e:

@@ -141,7 +141,7 @@ def runHorus(conf,video_file:str):
         
         frame = (resize(pred2).permute(1,2,0).detach().numpy()*255).astype(np.uint8)
         frame = np.squeeze(frame, axis=-1)
-        zero_mask = frame < 10
+        zero_mask = frame < 20
         frame = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
         frame[zero_mask] = [0, 0, 0]
 

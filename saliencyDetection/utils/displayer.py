@@ -88,7 +88,7 @@ class Printer:
         plt.legend()
         plt.xlabel("Epochs")
         plt.ylabel(f"Losses (10{get_exponential(exp)} scalar)")
-        plt.savefig(self.file_name)
+        plt.savefig(self.file_name,dpi=300)
         plt.close("all")
         plt.ioff()
             
