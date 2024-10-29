@@ -23,6 +23,10 @@ class Printer:
             pre = pred[i].detach().cpu().numpy().transpose(1,2,0)
             labe = label[i].detach().numpy().transpose(1,2,0)
 
+            im = im[:, :, :3]
+            pre = pre[:, :, :3]
+            labe = labe[:, :, :3]
+
             axarr[i][0].imshow((im))
             axarr[i][0].axis('off')
 
@@ -40,7 +44,7 @@ class Printer:
         plt.close(fig)
         plt.ioff()
     
-    def lossChart(self,loss:model.LossItems,exp:int=0) -> None:
+    def lossChart(self,loss:model.Items,exp:int=0) -> None:
         lmd = 10**exp
         yavg = loss.avg()
         ymin = loss.min()

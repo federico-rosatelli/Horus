@@ -196,7 +196,7 @@ class AVS1KDataSetStudentSpatial:
 
 class AVS1KDataSetStudentTemporal:
     sizeT:tuple[int,int] = (980,460)
-    sizeS:tuple[int,int] = (256,256)
+    sizeS:tuple[int,int] = (30,14)
 
     def __init__(self,rootDir,subDir) -> None:
         video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
@@ -270,6 +270,71 @@ class AVS1KDataSetStudentTemporal:
 
         return ((imgTemporalFrameTeacher,imgTemporalFrameStudent),
                 (imgTemporalGroundTeacher,imgTemporalGroundStudent))
+    
+
+
+class AVS1KDataSetStudentSpatioTemporal:
+    sizeS:tuple[int,int] = (30,14)
+
+    def __init__(self,rootDir,subDir) -> None:
+        video_Frame_List = sorted(glob(f"{rootDir}/{subDir}/Frame/*"))
+        video_Ground_List = sorted(glob(f"{rootDir}/{subDir}/Ground/*"))
+
+        self.all_Video_Frame = []
+        for video in video_Frame_List:
+            self.all_Video_Frame += sorted(glob(f"{video}/*"))
+        
+        self.all_Video_Ground = []
+        for ground in video_Ground_List:
+            self.all_Video_Ground += sorted(glob(f"{ground}/*"))
+
+    def __len__(self):
+        return len(self.all_Video_Frame)
+    
+    def __getitem__(self,i):
+        spatialFramePath = self.all_Video_Frame[i]
+        spatialGroundPath = self.all_Video_Ground[i]
+        if i == len(self.all_Video_Frame)-1:
+            temporalFramePath = self.all_Video_Frame[i]
+            temporalGroundPath = self.all_Video_Ground[i]
+        else:
+            temporalFramePath = self.all_Video_Frame[i+1] if (
+                                self.all_Video_Frame[i+1].split("/")[-2] == spatialFramePath.split("/")[-2]
+                                ) else self.all_Video_Frame[i]
+            temporalGroundPath = self.all_Video_Ground[i+1] if (
+                                self.all_Video_Ground[i+1].split("/")[-2] == spatialGroundPath.split("/")[-2]
+                                ) else self.all_Video_Ground[i]
+
+        #open spatial/temporal Frame and Ground
+        imgSpatialFrame = Image.open(spatialFramePath)
+        imgTemporalFrame = Image.open(temporalFramePath)
+        
+        imgSpatialGround = Image.open(spatialGroundPath)
+        imgTemporalGround = Image.open(temporalGroundPath)
+
+        imgSpatialFrameStudent = imgSpatialFrame.resize(self.sizeS)
+        imgTemporalFrameStudent = imgTemporalFrame.resize(self.sizeS)
+        
+        imgSpatialGroundStudent = imgSpatialGround.resize(self.sizeS)
+        imgTemporalGroundStudent = imgTemporalGround.resize(self.sizeS)
+
+        #from PIL to Tensor spatial/temporal Frame and Ground for Student
+
+        imgSpatialFrameStudent = pil_to_tensor(imgSpatialFrameStudent)/255
+        imgTemporalFrameStudent = pil_to_tensor(imgTemporalFrameStudent)/255
+        
+        imgSpatialGroundStudent = pil_to_tensor(imgSpatialGroundStudent)/255
+        imgTemporalGroundStudent = pil_to_tensor(imgTemporalGroundStudent)/255
+
+
+        imgTemporalFrameStudent = torch.cat((imgSpatialFrameStudent,imgTemporalFrameStudent),dim=0)
+        imgTemporalGroundStudent = (imgSpatialGroundStudent*0.5)+(imgTemporalGroundStudent*0.5)
+
+        
+
+        return ((imgSpatialFrameStudent,imgTemporalFrameStudent),
+                (imgSpatialGroundStudent,imgTemporalGroundStudent))
+
 
 
 

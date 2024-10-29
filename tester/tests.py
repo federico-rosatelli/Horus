@@ -22,6 +22,7 @@ class SaliencyTester:
     modelFileTeacher:str
     modelFileStudent:str
     modelUsages:BoolModelTester
+    modelParameters:BoolModelTester
     predictionAccuracy:BoolModelTester
     trainSetExample:BoolModelTester
     trainSetExample:BoolModelTester
@@ -33,6 +34,7 @@ class SaliencyTester:
         self.modelFileTeacher = conf["modelFileTeacher"]
         self.modelFileStudent = conf["modelFileStudent"]
         self.modelUsages = BoolModelTester(conf["modelUsages"]["teacherModel"],conf["modelUsages"]["studentModel"])
+        self.modelParameters = BoolModelTester(conf["modelParameters"]["teacherModel"],conf["modelParameters"]["studentModel"])
         self.predictionAccuracy = BoolModelTester(conf["predictionAccuracy"]["teacherModel"],conf["predictionAccuracy"]["studentModel"])
         self.trainSetExample = BoolModelTester(conf["trainSetExample"]["teacherModel"],conf["trainSetExample"]["studentModel"])
         self.validSetExample = BoolModelTester(conf["validSetExample"]["teacherModel"],conf["validSetExample"]["studentModel"])
@@ -72,6 +74,9 @@ def modelUsages(modelFile):
     checkpoint_optimizer = checkPoint.getOptimizer()
     assert (checkpoint_optimizer != None), f"The optimizer must exists!"
     return
+
+def modelParameters(modelClass:any):
+    return sum(p.numel() for p in modelClass.parameters())
 
 def predictionAccuracy(modelFile:str,model,dataset):
     from saliencyDetection.modelClasses import Horus
@@ -179,7 +184,32 @@ def testerCommandControll(conf:any):
     except AssertionError as ae:
             print(f"\tStudent:\t{saliency.modelUsages.studentModel}",f"\t[{ANSIColors.RED}X{ANSIColors.RESET}]",ae)
 
-    from saliencyDetection.modelClasses import HorusModelTeacherSpatial, HorusModelStudentSpatial
+
+    from saliencyDetection.modelClasses import Horus, HorusModelTeacherSpatial, HorusModelStudentSpatial
+
+    print("modelParameters:")
+    try:
+        print(f"\tTeacher:\t{saliency.modelParameters.teacherModel}",end="\r")
+        if saliency.modelParameters.teacherModel:
+            acc = modelParameters(Horus(HorusModelTeacherSpatial,saliency.modelFileTeacher).getModel())
+            print(f"\tTeacher:\t{saliency.modelParameters.teacherModel}",f"\t[{ANSIColors.GREEN}V{ANSIColors.RESET}] ({acc})")
+        else:
+            print(f"\tTeacher:\t{saliency.modelParameters.teacherModel}",f"\t[{ANSIColors.BLUE}-{ANSIColors.RESET}]")
+    except Exception as e:
+            print(f"\tTeacher:\t{saliency.modelParameters.teacherModel}",f"\t[{ANSIColors.RED}X{ANSIColors.RESET}]",e)
+
+    try:
+        print(f"\tStudent:\t{saliency.modelParameters.studentModel}",end="\r")
+        if saliency.modelParameters.studentModel:
+            acc = modelParameters(Horus(HorusModelStudentSpatial,saliency.modelFileStudent).getModel())
+            print(f"\tStudent:\t{saliency.modelParameters.studentModel}",f"\t[{ANSIColors.GREEN}V{ANSIColors.RESET}] ({acc})")
+        else:
+            print(f"\tStudent:\t{saliency.modelParameters.studentModel}",f"\t[{ANSIColors.BLUE}-{ANSIColors.RESET}]")
+    except Exception as e:
+            print(f"\tStudent:\t{saliency.modelParameters.studentModel}",f"\t[{ANSIColors.RED}X{ANSIColors.RESET}]",e)
+
+         
+
     from saliencyDetection.dataLoader.dataLoader import AVS1KDataSetTeacherSpatial, AVS1KDataSetStudentSpatialOnly
     print("predictionAccuracy:")
     try:

@@ -1,13 +1,11 @@
 import torch
 import torch.nn as nn
-import numpy as np
 import logging
 from torchvision.transforms import Resize
 import inspect
 logging.getLogger("numpy").propagate = False
 
 U = 0.5
-resize = Resize((23,39))
 
 
 
@@ -31,7 +29,7 @@ class HorusLossFunction(nn.Module):
 
 
 def Loss(student_predict,teacher_predict,ground_teacher):
-
+    resize = Resize((student_predict.size(2),student_predict.size(3)))
     teacher_resize = resize(teacher_predict)
     ground_resize = resize(ground_teacher)
     

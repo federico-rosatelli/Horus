@@ -9,6 +9,9 @@ saliencyDetection:
       modelUsages:
             teacherModel:     False
             studentModel:     False
+      modelParameters:
+            teacherModel:     True
+            studentModel:     True
       predictionAccuracy:
             teacherModel:     False
             studentModel:     False

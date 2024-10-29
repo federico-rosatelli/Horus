@@ -3,7 +3,9 @@ logging.getLogger("matplotlib").propagate = False
 logging.getLogger("PIL.PngImagePlugin").propagate = False
 logging.getLogger("matplotlib.font_manager").propagate = False
 from . import *
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from saliencyDetection.utils.model import CheckPoint
 
 
@@ -62,42 +64,42 @@ class HorusModelTeacherSpatial(nn.Module):
     def __init__(self):
         super(HorusModelTeacherSpatial,self).__init__()
         
-        self.re = nn.ReLU()
-        
         self.encoder = nn.Sequential(
             nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2,stride=2),
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2,stride=2),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2,stride=2),
+            nn.ReLU(),
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
         )
 
         self.decoder = nn.Sequential(
+            nn.Conv2d(1024, 256, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
             nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            # nn.BatchNorm2d(32),
-            # nn.ReLU(),
-            nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(64, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.ConvTranspose2d(16, 8, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.ReLU(),
             nn.ConvTranspose2d(8, 1, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.Sigmoid()
-            # nn.ReLU(),
-            # nn.BatchNorm2d(1)
         )
         
     def forward(self, x):
@@ -118,30 +120,39 @@ class HorusModelTeacherTemporal(nn.Module):
         self.encoder = nn.Sequential(
             nn.Conv2d(6, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2,stride=2),
-            nn.ReLU(),
-            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2,stride=2),
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2,stride=2),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
         )
 
         self.decoder = nn.Sequential(
-            nn.Conv2d(128, 32, kernel_size=1, stride=1, padding=1),
+            nn.Conv2d(1024, 256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(32, 16, kernel_size=4, stride=1, padding=1),
+            nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(16, 8, kernel_size=2, stride=2, padding=1, output_padding=1),
+            nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(8, 1, kernel_size=1, stride=2, padding=1, output_padding=1),
-            nn.ReLU()
-            
+            nn.Conv2d(64, 16, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(16, 8, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(8, 1, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.Sigmoid()
         )
         
     def forward(self, x):
@@ -161,31 +172,32 @@ class HorusModelStudentSpatial(nn.Module):
         self.encoder = nn.Sequential(
             nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2,stride=2),
             nn.ReLU(),
-            nn.Conv2d(64, 256, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2,stride=2),
             nn.ReLU(),
-            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU()
         )
 
         self.decoder = nn.Sequential(
-            nn.Conv2d(512, 256, kernel_size=1, stride=1, padding=1),
+            nn.Conv2d(128, 32, kernel_size=1, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1, output_padding=1),
+            nn.Conv2d(32, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(16, 8, kernel_size=4, stride=2, padding=1, output_padding=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1, output_padding=1),
-            nn.ReLU(),
-            nn.Conv2d(16, 1, kernel_size=3, stride=1, padding=1),
-            nn.ReLU()
+            nn.ConvTranspose2d(8, 1, kernel_size=4, stride=2, padding=1, output_padding=1)
         )
 
     def forward(self, x, spatiotemporal=False):
@@ -199,7 +211,7 @@ class HorusModelStudentSpatial(nn.Module):
 
 class HorusModelStudentTemporal(nn.Module):
     """
-    Horus Student CNN Model.
+    Horus Student CNN Temporal Model.
     """
     def __init__(self):
         super(HorusModelStudentTemporal, self).__init__()
@@ -243,3 +255,47 @@ class HorusModelStudentTemporal(nn.Module):
 
         return x
 
+
+def random_normal_fusion(img1:any, img2:any) -> any:
+    """
+    Random Normal Distribution implementing SpatioTemporal Fusion
+    """
+    weights = torch.randn_like(img1)
+    weights = torch.clamp(weights, 0, 1)
+
+    weights /= weights.sum(dim=1, keepdim=True)
+
+    fused_img = (weights * img1) + ((1 - weights) * img2)
+
+    return fused_img
+
+
+class HorusSpatioTemporalModel:
+    def __init__(self,classModelSpatial,classModelTemporal) -> None:
+        self.spatialModel = classModelSpatial
+        self.temporalModel = classModelTemporal
+
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, kernel_size=1, stride=2),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, kernel_size=1, stride=2),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, padding=1)
+        )
+    
+    def forward(self,x_s,x_t):
+
+        x_s = self.spatialModel(x_s,spatiotemporal=True)
+        x_t = self.temporalModel(x_t,spatiotemporal=True)
+
+        x = random_normal_fusion(x_s,x_t)
+
+        x = self.decoder(x)
+        padding = (0, 3)
+        x = F.pad(x, padding, mode='constant', value=0)
+
+        return x

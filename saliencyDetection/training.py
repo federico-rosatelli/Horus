@@ -3,12 +3,13 @@
 Train Horus CNN Model
 """
 import logging
+import os
 logging.getLogger("matplotlib").propagate = False
 logging.getLogger("PIL.PngImagePlugin").propagate = False
 logging.getLogger("matplotlib.font_manager").propagate = False
 from .dataLoader import dataLoader as dtL
 from . import lossFunction
-from saliencyDetection.utils.model import CheckPoint
+from saliencyDetection.utils.model import CheckPoint,accuracyPrediction
 from saliencyDetection.utils.displayer import Printer
 from . import *
 import torch
@@ -33,9 +34,12 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
     files = conf["files"]
 
     if type_run.lower() == "temporal":
-        model_save = files["ModelTemporal"]
+        model_save:str = files["ModelTemporal"]
     else:
-        model_save = files["ModelSpatial"]
+        model_save:str = files["ModelSpatial"]
+    
+    model_save_epoch = model_save.split(".")[0]
+    model_dir_epoch = os.path.join(ROOT_DIR,MODEL_DIR,"epochs")
 
     if verbose:
         logger = logging.getLogger(verbose)
@@ -52,7 +56,7 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
     if batch_saving < 0:
         raise ValueError(f"Value for batch_saving must be > 0. Got: {batch_saving}")
     
-    p = Printer(f"{type_run}_min_pred.png")
+    p = Printer(f"teacher_{type_run}_pred.png")
     check = CheckPoint(model_save)
 
     train = dtL.newLoader(datasetCLass,ROOT_DIR,TRAIN_SET,batch_size)
@@ -70,17 +74,18 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
     
     optimizer = torch.optim.AdamW(model.parameters(),learning_rate)
     
-    epochs_history = [[] for _ in epochs]
+    epochs_history = [[] for _ in range(epochs)]
+    accuracy_history = [[] for _ in range(epochs)]
     min_loss = float('inf')
     avg_loss = float('inf')
 
     model.train()
 
     for k in range(epochs):
+        check_epoch = CheckPoint(f"{model_save_epoch}_epoch_{k+1}.pt",model_dir_epoch)
         if verbose:
             logger.info(f"TEACHER TRAINING EPOCH {type_run.upper()}: {k+1} of {epochs}")
-        #batch_history = []
-        
+        check.save(k+1,model,optimizer,epochs_history,accuracy_history)
         for batch,(imgs,labels) in enumerate(train):
 
             x = imgs.to(device)
@@ -94,8 +99,10 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
             loss.backward()
             optimizer.step()
             loss = loss.item()
-            
+
+
             epochs_history[k].append(loss)
+            accuracy_history[k].append(accuracyPrediction(predict,y))
             
             p.save(x[:4],predict[:4],y[:4])
             if batch % batch_saving == 0 and batch != 0:
@@ -107,22 +114,21 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
                 max_batch = max(latest_batch)
 
                 if verbose:
-                    logger.info(f"Avg {type_run.lower().title()} Loss Batch {batch}: {avg_batch} ¦ Min Loss: {min_batch} ¦ Max Loss: {max_batch}")
+                    logger.info(f"Avg {type_run.lower().title()} Loss Batch {batch}: {avg_batch} ¦ Min Loss: {min_batch} ¦ Max Loss: {max_batch} ¦ Accuracy:{(sum(accuracy_history[k])/len(accuracy_history[k])):.2f}%")
                     
                 if avg_batch < avg_loss:
                     if verbose:
                         logger.info(f"Saving {type_run.lower().title()} Model...")
-                    check.save(k+1,model,optimizer,epochs_history)
-                    #torch.save(model.state_dict(), f"{DIR}/models/{model_save}")
+                    check.save(k+1,model,optimizer,epochs_history,accuracy_history)
                     avg_loss = avg_batch
                     
             if loss < min_loss:
                 if verbose:
-                    logger.info(f"Saving {type_run.lower().title()} Model for min Loss: {loss}...")
-                check.save(k+1,model,optimizer,epochs_history)
-                #torch.save(model.state_dict(), f"{DIR}/models/{model_save}")
+                    logger.info(f"Saving {type_run.lower().title()} Model for min Loss: {loss} ¦ Accuracy:{(sum(accuracy_history[k])/len(accuracy_history[k])):.2f}%")
+                check.save(k+1,model,optimizer,epochs_history,accuracy_history)
                 min_loss = loss
 
+        check_epoch.save(k+1,model,optimizer,epochs_history,accuracy_history)
         # epochs_history.append(batch_history)
         # batch_history = []
 
@@ -185,8 +191,8 @@ def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_
     optimizer = torch.optim.AdamW(model.parameters(),learning_rate)   #optimizer for model
 
     epochs_history = [[] for _ in range(epochs)]
-    min_loss = 1
-    avg_loss = 1
+    min_loss = float('inf')
+    avg_loss = float('inf')
 
     model.train()
 
@@ -339,4 +345,108 @@ def trainHorusTeacher_checkpoint(conf:any,type_run="spatial",verbose:str|None=No
                 check.save(k+1,model,optimizer,epochs_history)
                 min_loss = loss
 
+    return
+
+
+def trainSpatioTemporalHorus(conf:any,datasetClass:any,model:any,spatialModel:any,temporalModel:any,verbose:str|None=None) -> None:
+
+    files = conf["files"]
+    
+    if verbose:
+        logger = logging.getLogger(verbose)
+    
+    epochs = int(conf["epochs"])
+    if epochs < 0 or epochs > 4096:
+        raise ValueError(f"Value for build must be > 0 & < 4097 not {epochs}")
+    
+    batch_size = int(conf["batch_size"])
+    if batch_size < 0:
+        raise ValueError(f"Value for batch must be > 0. Got: {batch_size}")
+    
+    batch_saving = int(conf["batch_saving"])
+    if batch_saving < 0:
+        raise ValueError(f"Value for batch_saving must be > 0. Got: {batch_saving}")
+    
+    model_save = files["ModelSpatial"]
+    
+    train = dtL.newLoader(datasetClass,ROOT_DIR,TRAIN_SET,batch_size)
+    
+    device = torch.device("cpu")
+    
+    stModel = model(spatialModel,temporalModel)
+
+
+    check = CheckPoint(model_save)
+
+
+    learning_rate = conf["learning_rate"]
+
+    my_loss_fn = lossFunction.HorusSpatioTemporalLoss()   # my custom spatiotemporal loss function
+
+
+    optimizer = torch.optim.AdamW(stModel.parameters(),learning_rate)
+
+    stModel.train()
+
+    epochs_history = [[] for _ in range(epochs)]
+    
+    min_loss = 1
+
+    avg_loss = 1
+
+    
+
+    for k in range(epochs):
+        
+        if verbose:
+            logger.info(f"SPATIOTEMPORAL TRAINING EPOCH: {k+1} of {epochs}")
+        
+        check.save(k+1,model,optimizer,epochs_history)
+        for batch,(imgs,labels) in enumerate(train):
+            
+            x_spatial,x_temporal = imgs
+            y_spatial,y_temporal = labels
+
+            x_spatial = x_spatial.to(device)                    #spatial image  student
+            x_temporal = x_temporal.to(device)                  #temporal image student
+
+            y_spatial = y_spatial.to(device)                    #spatial label  student
+            y_temporal = y_temporal.to(device)                  #temporal label student
+
+            
+            optimizer.zero_grad()
+
+            predict = stModel(x_spatial,x_temporal)
+
+            loss = my_loss_fn(predict,y_spatial)
+            loss.backward()
+            optimizer.step()
+            loss = loss.item()
+
+            epochs_history[k].append(loss)
+
+            if batch % batch_saving == 0 and batch != 0:
+                
+                latest_batch = epochs_history[k][-batch_saving:]
+
+                avg_l = sum(latest_batch)/batch_saving            #average loss of batch length
+                min_l = min(latest_batch)                         #min loss of batch length
+
+
+                if verbose:
+                    logger.info(f"Avg SpatioTemporal Loss Batch {batch}: {avg_l} ¦ Min Loss: {min_l}")
+
+                if avg_l < avg_loss:
+                    if verbose:
+                        logger.info(f"Saving SpatioTemporal Model...")
+                    check.save(k+1,model,optimizer,epochs_history)
+                    avg_loss = avg_l
+                
+            
+            if loss < min_loss:         #if the spatial loss is less then the minumum spatial loss
+                if verbose:
+                    logger.info(f"Saving SpatioTemporal Model for min Loss: {loss}...")
+                check.save(k+1,model,optimizer,epochs_history)
+                min_loss = loss
+    
     return
