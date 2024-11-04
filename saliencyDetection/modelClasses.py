@@ -1,3 +1,4 @@
+import inspect
 import logging
 logging.getLogger("matplotlib").propagate = False
 logging.getLogger("PIL.PngImagePlugin").propagate = False
@@ -299,3 +300,50 @@ class HorusSpatioTemporalModel:
         x = F.pad(x, padding, mode='constant', value=0)
 
         return x
+
+
+
+
+
+class GenericHorusModel(nn.Module):     #NOT USED
+    def __init__(self,conf_obj) -> None:
+        super().__init__()
+
+        input_size = conf_obj["input_size"]
+
+        self.layers = []
+
+        for layer in conf_obj["hidden_layers"]:
+            layer_class = self.getClassFromName(layer["layer"])
+            size = layer["size"]
+            kernel_size = layer["kernel_size"] if "kernel_size" in layer else 2
+            stride = layer["stride"] if "stride" in layer else 1
+            padding = layer["padding"] if "padding" in layer else 0
+
+            nnLayer = layer_class(input_size,size,kernel_size=kernel_size,stride=stride,padding=padding)
+            activation = self.getClassFromName(layer["activation"])()
+            
+            self.layers.append(nnLayer)
+            self.layers.append(activation)
+
+            input_size = size
+        
+        output_activation = self.getClassFromName(conf_obj["output_activation"])()
+        
+        self.layers.append(output_activation)
+    
+
+    def forward(self,x):
+        for layer in self.layers:
+            x = layer(x)
+        
+        return x
+            
+
+    def getClassFromName(self,name:str) -> any:
+        for cls_name,obj in inspect.getmembers(nn):
+            if inspect.isclass(obj):
+                if name == cls_name:
+                    return obj
+        return None
+    

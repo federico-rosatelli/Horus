@@ -4,7 +4,7 @@
 
 [Università La Sapienza Roma](https://www.uniroma1.it/), [Dipartimento di Informatica](https://www.studiareinformatica.uniroma1.it/)
 
-![Sapienza Università di Roma](https://upload.wikimedia.org/wikipedia/it/thumb/0/0d/Uniroma1.svg/1200px-Uniroma1.svg.png)
+![Sapienza Università di Roma](https://upload.wikimedia.org/wikipedia/commons/0/0d/Uniroma1.svg)
 
 # SALIENCY DETECTION
 ## SPATIOTEMPORAL KNOWLEDGE DISTILLATION
@@ -30,7 +30,7 @@ Esempio di come costruire la rete neurale horus con i parametri inseriti nel fil
 
 Impossibile eseguire senza dataset!
 
-```python
+```shell
 python3 horus.py build --verbose staging
 ```
 
@@ -38,7 +38,7 @@ python3 horus.py build --verbose staging
 
 Prende in input un file .avi nella cartella `tester/videos/` e restituisce come output un video .mp4 nella stessa cartella con la heatmap generata dal modello studente.
 
-```python
+```shell
 python3 horus.py run
 ```
 

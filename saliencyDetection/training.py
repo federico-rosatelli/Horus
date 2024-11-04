@@ -39,7 +39,7 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
         model_save:str = files["ModelSpatial"]
     
     model_save_epoch = model_save.split(".")[0]
-    model_dir_epoch = os.path.join(ROOT_DIR,MODEL_DIR,"epochs")
+    model_dir_epoch = os.path.join(DIR,MODEL_DIR,"epochs")
 
     if verbose:
         logger = logging.getLogger(verbose)
