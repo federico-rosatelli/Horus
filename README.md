@@ -24,6 +24,17 @@ Il progetto è suddiviso in 3 aree:
 
 # USAGE
 
+## Download Dataset
+
+Per scaricare il dataset completo:
+
+```shell
+chmod +x download_dataset.sh
+./download_dataset.sh "link_drive_folder"
+```
+
+Per completare il tutto seguire eseguire il file `.sh` all'interno della cartella `2020-TIP-Fu-MMNet`
+
 ## Build horus
 
 Esempio di come costruire la rete neurale horus con i parametri inseriti nel file di configurazione `config/conf.yaml`
