@@ -78,20 +78,20 @@ def trainHorusNetwork(conf:any,verbose:str|None=None) -> None:
 
     pathStudentSpatial = Path(f'{DIR}/{MODEL_DIR}/{studentConf["files"]["ModelSpatial"]}')  #student model
     
+    # Not checkpoint from now on
     if not pathStudentSpatial.exists():     #skip if model exists
         # Spatial Student Training
         teacherModelS = modelClasses.Horus(modelClasses.HorusModelTeacherSpatial,teacherConf["files"]["ModelSpatial"],device=conf["device"])
-        training.trainHorusStudent(conf,dtL.AVS1KDataSetStudentSpatial,modelClasses.HorusModelStudentSpatial,teacherModelS,type_run="spatial",verbose=verbose)
-
+        student_spatial = training.trainHorusStudent(conf,dtL.AVS1KDataSetStudentSpatial,modelClasses.HorusModelStudentSpatial,teacherModelS,type_run="spatial",verbose=verbose)
     
     pathStudentTemporal = Path(f'{DIR}/{MODEL_DIR}/{studentConf["files"]["ModelTemporal"]}')  #student model
     
     if not pathStudentTemporal.exists():     #skip if model exists
         # Temporal Student Training
         teacherModelT = modelClasses.Horus(modelClasses.HorusModelTeacherTemporal,teacherConf["files"]["ModelTemporal"],device=conf["device"])
-        training.trainHorusStudent(conf,dtL.AVS1KDataSetStudentTemporal,modelClasses.HorusModelStudentTemporal,teacherModelT,type_run="temporal",verbose=verbose)
+        student_temporal = training.trainHorusStudent(conf,dtL.AVS1KDataSetStudentTemporal,modelClasses.HorusModelStudentTemporal,teacherModelT,type_run="temporal",verbose=verbose)
         
-    print("===")
+    training.trainSpatioTemporalHorus(conf,dtL.AVS1KDataSetStudentSpatioTemporal,modelClasses.HorusSpatioTemporalModel,student_spatial,student_temporal,verbose=verbose)
     
 
 

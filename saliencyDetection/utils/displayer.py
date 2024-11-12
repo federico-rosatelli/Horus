@@ -54,7 +54,6 @@ class Printer:
         plt.xticks(x)
         for i in range(len(yavg)):
             plt.text(i+1,yavg[i],"%.3f" % yavg[i])
-            #plt.text(i,max_losses[i],"%.3f" % max_losses[i])
             plt.text(i+1,ymin[i],"%.3f" % ymin[i])
         plt.legend()
         plt.xlabel("Epochs")
@@ -82,13 +81,13 @@ class Printer:
         
         x = [i+1 for i in range(len(avg_losses))]
         plt.plot(x,avg_losses,label="AVG LOSSES")
-        #plt.plot([i for i in range(len(max_losses))],max_losses,label="MAX LOSSES")
         plt.plot(x,min_losses,label="MIN LOSSES")
         plt.xticks(x)
+
         for i in range(len(avg_losses)):
             plt.text(i+1,avg_losses[i],"%.3f" % avg_losses[i])
-            #plt.text(i,max_losses[i],"%.3f" % max_losses[i])
             plt.text(i+1,min_losses[i],"%.3f" % min_losses[i])
+            
         plt.legend()
         plt.xlabel("Epochs")
         plt.ylabel(f"Losses (10{get_exponential(exp)} scalar)")

@@ -309,7 +309,7 @@ def testerCommandControll(conf:any):
     try:
         print(f"\tStudent:\t{saliency.plotDisplayer.studentModel}",end="\r")
         if saliency.plotDisplayer.studentModel:
-            loss = checkpointS.load().getLoss()
+            # loss = checkpointS.load().getLoss()
             plotDisplayerLog(STUDENT_SPATIAL_LOG_FILE,"loss_plot_student_tester.png",3)
             #plotDisplayer(loss,"prova.png",3)
             print(f"\tStudent:\t{saliency.plotDisplayer.studentModel}",f"\t[{ANSIColors.GREEN}V{ANSIColors.RESET}]")

@@ -10,8 +10,8 @@ saliencyDetection:
             teacherModel:     False
             studentModel:     False
       modelParameters:
-            teacherModel:     True
-            studentModel:     True
+            teacherModel:     False
+            studentModel:     False
       predictionAccuracy:
             teacherModel:     False
             studentModel:     False

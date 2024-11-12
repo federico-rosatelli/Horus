@@ -135,7 +135,7 @@ def trainHorusTeacher(conf:any,datasetCLass:any,model:any,type_run:str="spatial"
     return
 
 
-def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_run:str="spatial",verbose:str|None=None) -> None:
+def trainHorusStudent(conf:any,datasetClass:any,model:any,teacherModel:any,type_run:str="spatial",verbose:str|None=None) -> any:
     """
     Training of Horus Student Model.\n
     Spatial & Temporal Knowledge implemented.

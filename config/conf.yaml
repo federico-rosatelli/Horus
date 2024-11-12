@@ -1,16 +1,16 @@
-version: 0.24.308b
+version: 0.24.317b
 
 
 saliencyDetection:
 
-      device: cpu
+      device: cuda      #cpu | cuda
 
       teacher:
             training:
-                  epochs:           12
-                  batch_size:       16
-                  batch_saving:     10
-                  learning_rate:    0.001
+                  epochs:           24
+                  batch_size:       32
+                  batch_saving:     100
+                  learning_rate:    0.0001
                   loss_class:       BCELoss
 
                   files:
@@ -19,9 +19,9 @@ saliencyDetection:
       
       student:
             training:
-                  epochs:           12
-                  batch_size:       16
-                  batch_saving:     10
+                  epochs:           64
+                  batch_size:       32
+                  batch_saving:     100
                   learning_rate:    0.0001
 
                   files:
